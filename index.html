@@ -454,7 +454,7 @@ $('n-dt').valueAsDate = new Date();
 ['li-u','li-p'].forEach(id=>$(id).addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); }));
 
 window.onload = function(){
-  USERS = loadUsers();
+  USERS = [] ;
   initSB(SUPABASE_URL, SUPABASE_KEY);
   loadEJSSettings();
 };
