@@ -779,24 +779,38 @@ async function addObs(){
 
 // ══ CARD ════════════════════════════════════════════════════
 
-function actionTimeline(action){
-  if(!action || !action.trim()){
-    return '<div class="empty">لا توجد إجراءات محفوظة بعد</div>';
+async function loadActions(id){
+  const box = $('acts'+id);
+  if(!box) return;
+
+  box.innerHTML = 'جاري التحميل...';
+
+  const { data, error } = await SB
+    .from('observation_actions')
+    .select('*')
+    .eq('observation_id', id)
+    .order('created_at', { ascending:false });
+
+  if(error){
+    console.log('ACTIONS ERROR:', error);
+    box.innerHTML = 'خطأ في تحميل الإجراءات';
+    return;
   }
 
-  return '<div class="timeline">' + action
-    .split('-----------------------')
-    .filter(x => x.trim())
-    .map(x=>{
-      const lines = x.trim().split('\n');
-      const meta = lines.shift() || '';
-      const text = lines.join('\n');
+  if(!data || !data.length){
+    box.innerHTML = 'لا توجد إجراءات بعد';
+    return;
+  }
 
-      return '<div class="titem">' +
-               '<div class="tmeta">' + meta + '</div>' +
-               '<div class="ttext">' + text + '</div>' +
-             '</div>';
-    }).join('') + '</div>';
+  box.innerHTML = '<div class="timeline">' + data.map(a=>{
+    const dt = new Date(a.created_at).toLocaleString('ar-SA');
+    const st = S_LBL[a.status] || a.status;
+
+    return '<div class="titem">' +
+      '<div class="tmeta">' + dt + ' | ' + st + '</div>' +
+      '<div class="ttext">' + a.action_text + '</div>' +
+    '</div>';
+  }).join('') + '</div>';
 }
   
 function card(o,isAdmin){
@@ -820,7 +834,7 @@ function card(o,isAdmin){
          
 <div class="fg ff">
   <label>سجل الإجراءات السابقة</label>
-  ${actionTimeline(o.action)}
+  <div id="acts${o.id}"></div>
 </div>
 
 <div class="fg ff">
@@ -837,8 +851,14 @@ function card(o,isAdmin){
   </div>`;
 }
 
-function tog(id){ openId=openId===id?null:id; rerender(); }
+function tog(id){
+  openId = openId === id ? null : id;
+  rerender();
 
+  if(openId){
+    setTimeout(()=>loadActions(id), 100);
+  }
+}
   // save card
 async function saveCard(id){
   const newAction = $('ac'+id).value.trim();
