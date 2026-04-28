@@ -802,12 +802,64 @@ function card(o,isAdmin){
 
 function tog(id){ openId=openId===id?null:id; rerender(); }
 
+  // save card
 async function saveCard(id){
-  const {error}=await SB.from('observations').update({
-    status:$('s'+id).value, action:$('ac'+id).value, deadline:$('dl'+id).value||null
-  }).eq('id',id);
-  if(error){ toast('خطأ في الحفظ'); return; }
-  toast('تم حفظ التحديث ✓'); rerender();
+  const newAction = $('ac'+id).value.trim();
+  const newStatus = $('s'+id).value;
+  const newDeadline = $('dl'+id).value || null;
+
+  if(!newAction){
+    toast('اكتب الإجراء التصحيحي أولاً');
+    return;
+  }
+
+  // قراءة الإجراء القديم
+  const { data: old, error: readError } = await SB
+    .from('observations')
+    .select('action')
+    .eq('id', id)
+    .single();
+
+  if(readError){
+    toast('خطأ في قراءة البيانات');
+    console.log(readError);
+    return;
+  }
+
+  // 🟢 التاريخ + الوقت
+  const now = new Date();
+  const dateTime =
+    now.toLocaleDateString('ar-SA') + ' - ' +
+    now.toLocaleTimeString('ar-SA');
+
+  const statusLabel = S_LBL[newStatus] || newStatus;
+
+  // دمج الجديد مع القديم
+  const combinedAction =
+`${dateTime} | ${statusLabel}
+${newAction}
+
+-----------------------
+${old?.action || ''}`;
+
+  // حفظ في قاعدة البيانات
+  const { error } = await SB.from('observations').update({
+    status: newStatus,
+    action: combinedAction,
+    deadline: newDeadline
+  }).eq('id', id);
+
+  if(error){
+    toast('خطأ في الحفظ');
+    console.log(error);
+    return;
+  }
+
+  // تنظيف الحقل
+  $('ac'+id).value = '';
+
+  toast('تم حفظ الإجراء ✓');
+  rerender();
 }
 
 async function delObs(id,e){
