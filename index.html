@@ -203,6 +203,12 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
   .urow .ulbl{display:none;}
   .wrap{padding:14px;}.nav{padding:0 14px;}.lc{padding:30px 18px;}
 }
+
+.timeline{margin-top:8px;display:flex;flex-direction:column;gap:10px;}
+.titem{background:var(--surf);border:1px solid var(--bdr);border-right:4px solid var(--navy);border-radius:10px;padding:10px 12px;}
+.tmeta{font-size:11px;color:var(--mut);margin-bottom:6px;}
+.ttext{font-size:13px;color:var(--txt);line-height:1.7;white-space:pre-wrap;}
+  
 </style>
 </head>
 <body>
@@ -772,6 +778,28 @@ async function addObs(){
 }
 
 // ══ CARD ════════════════════════════════════════════════════
+
+function actionTimeline(action){
+  if(!action || !action.trim()){
+    return '<div class="empty">لا توجد إجراءات محفوظة بعد</div>';
+  }
+
+  return <div class="timeline"> + action
+    .split('-----------------------')
+    .filter(x => x.trim())
+    .map(x=>{
+      const lines = x.trim().split('\n');
+      const meta = lines.shift() || '';
+      const text = lines.join('\n');
+      return `
+        <div class="titem">
+          <div class="tmeta">${meta}</div>
+          <div class="ttext">${text}</div>
+        </div>
+      `;
+    }).join('') + </div>;
+}
+  
 function card(o,isAdmin){
   const isOpen=openId===o.id;
   const tag=isAdmin?`<span class="dtag">${getDeptName(o.dept)}</span>`:'';
@@ -790,7 +818,17 @@ function card(o,isAdmin){
           <select id="s${o.id}"><option value="pending"${o.status==='pending'?' selected':''}>لم تُعالَج</option><option value="progress"${o.status==='progress'?' selected':''}>قيد المعالجة</option><option value="done"${o.status==='done'?' selected':''}>مكتملة</option></select>
         </div>
         <div class="fg"><label>الموعد المتوقع للإنجاز</label><input type="date" id="dl${o.id}" value="${o.deadline||''}"></div>
-        <div class="fg ff"><label>الإجراء التصحيحي المتخذ</label><textarea id="ac${o.id}">${o.action||''}</textarea></div>
+         
+<div class="fg ff">
+  <label>سجل الإجراءات السابقة</label>
+  ${actionTimeline(o.action)}
+</div>
+
+<div class="fg ff">
+  <label>إضافة إجراء تصحيحي جديد</label>
+  <textarea id="ac${o.id}" placeholder="اكتب الإجراء الجديد هنا..."></textarea>
+</div>
+        
       </div>
       <div class="fa">
         ${isAdmin?`<button class="bdel" onclick="delObs(${o.id},event)">حذف</button>`:'<span></span>'}
@@ -813,7 +851,6 @@ async function saveCard(id){
     return;
   }
 
-  // قراءة الإجراء القديم
   const { data: old, error: readError } = await SB
     .from('observations')
     .select('action')
@@ -821,12 +858,11 @@ async function saveCard(id){
     .single();
 
   if(readError){
-    toast('خطأ في قراءة البيانات');
+    toast('خطأ في قراءة الإجراء السابق');
     console.log(readError);
     return;
   }
 
-  // 🟢 التاريخ + الوقت
   const now = new Date();
   const dateTime =
     now.toLocaleDateString('ar-SA') + ' - ' +
@@ -834,15 +870,12 @@ async function saveCard(id){
 
   const statusLabel = S_LBL[newStatus] || newStatus;
 
-  // دمج الجديد مع القديم
+  const oldAction = old?.action ? old.action.trim() : '';
+
   const combinedAction =
 `${dateTime} | ${statusLabel}
-${newAction}
+${newAction}${oldAction ? '\n\n-----------------------\n' + oldAction : ''}`;
 
------------------------
-${old?.action || ''}`;
-
-  // حفظ في قاعدة البيانات
   const { error } = await SB.from('observations').update({
     status: newStatus,
     action: combinedAction,
@@ -855,10 +888,8 @@ ${old?.action || ''}`;
     return;
   }
 
-  // تنظيف الحقل
-  $('ac'+id).value = '';
-
   toast('تم حفظ الإجراء ✓');
+  openId = id;
   rerender();
 }
 
