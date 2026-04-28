@@ -347,7 +347,7 @@ create policy "open_access" on observations
             <div class="fg2"><label>القسم المعني</label><select id="n-d"><option value="">— اختر —</option></select></div>
             <div class="fg2"><label>الأولوية</label><select id="n-p"><option value="high">عالية</option><option value="mid">متوسطة</option><option value="low">منخفضة</option></select></div>
             <div class="fg2"><label>مصدر الملاحظة</label>
-              <select id="n-s"><option value="field">تقرير مفتش ميداني</option><option value="meeting">اجتماع دوري</option><option value="complaint">شكوى / بلاغ</option><option value="other">أخرى</option></select>
+              <select id="n-s"><option value="field">المخالفات</option><option value="meeting">الزيارات</option><option value="complaint">الاعتراضات</option><option value="other">أخرى</option></select>
             </div>
             <div class="fg2"><label>تاريخ الملاحظة</label><input type="date" id="n-dt"></div>
           </div>
@@ -537,16 +537,16 @@ if(error){
   $s('nav-u', CU.label);
   $s('nav-sub', CU.role === 'admin' ? 'لوحة المدير' : 'واجهة القسم');
 
-  if(CU.role === 'admin'){
-    show('av');
-    buildDeptFilter();
-    renderAdmin();
-    renderDeptTab();
-  } else {
-    show('dv');
-    $s('d-title', 'ملاحظات ' + CU.label);
-    renderDept();
-  }
+if(CU.role === 'admin'){
+  show('av');
+  await buildDeptFilter();
+  await renderAdmin();
+  await renderDeptTab();
+} else {
+  show('dv');
+  $s('d-title', 'ملاحظات ' + CU.label);
+  await renderDept();
+}
 
   checkReminder();
 }
