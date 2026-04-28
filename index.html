@@ -445,7 +445,7 @@ let SB=null, CU=null, USERS=[], aFil='all', dFil='all', selDept='', openId=null;
 // ══ HELPERS ══════════════════════════════════════════════════
 const $  = id => document.getElementById(id);
 const $s = (id,v) => { const e=$(id); if(e) e.textContent=v; };
-const show = id => $(id).style.display='block';
+const show = id => $(id).style.display = id === 'login-screen' ? 'flex' : 'block';
 const hide = id => $(id).style.display='none';
 function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
 function chOn(cid,el){ document.querySelectorAll('#'+cid+' .chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); }
