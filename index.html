@@ -22,7 +22,7 @@
 body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;direction:rtl}
 
 /* ── SETUP ───────────────────────────────────────────────── */
-#setup{position:fixed;inset:0;background:rgba(10,15,35,.9);z-index:1000;display:none;align-items:center;justify-content:center;overflow-y:auto;padding:20px;}
+#setup{position:fixed;inset:0;background:rgba(10,15,35,.9);z-index:1000;display:none !important;align-items:center;justify-content:center;overflow-y:auto;padding:20px;}
 .setup-box{background:var(--w);border-radius:18px;padding:36px;width:520px;max-width:95vw;}
 .setup-box h2{font-size:17px;font-weight:600;color:var(--navy);margin-bottom:6px;}
 .setup-box p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.6;}
@@ -208,7 +208,7 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 <body>
 
 <!-- ══ SETUP OVERLAY ════════════════════════════════════════ -->
-<div id="setup">
+<div id="setup" style="display:none;">
   <div class="setup-box">
     <h2>🔧 إعداد قاعدة البيانات — مرة واحدة فقط</h2>
     <p>أنشئ مشروعاً مجانياً على <strong>supabase.com</strong> ثم شغّل هذا الكود في SQL Editor، وأدخل بيانات الاتصال.</p>
