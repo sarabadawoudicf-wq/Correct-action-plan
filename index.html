@@ -652,6 +652,8 @@ async function renderDeptTab(){
     .select('dept,label,role')
     .eq('role','dept');
 
+  console.log('DEPTS:', depts, 'DEPT ERROR:', deptErr);
+
   if(deptErr){
     console.log('DEPT TAB PROFILES ERROR:', deptErr);
     $('dept-grid').innerHTML = '<div class="empty">خطأ في تحميل الأقسام</div>';
@@ -661,6 +663,8 @@ async function renderDeptTab(){
   const { data: all, error: obsErr } = await SB
     .from('observations')
     .select('*');
+
+  console.log('OBS:', all, 'OBS ERROR:', obsErr);
 
   if(obsErr){
     console.log('DEPT TAB OBS ERROR:', obsErr);
@@ -700,7 +704,7 @@ async function renderDeptTab(){
     </div>`;
   }).join('');
 
-  selDD(selDept, all);
+  await selDD(selDept, all);
 }
 
 async function selDD(d, preloaded){
@@ -709,29 +713,41 @@ async function selDD(d, preloaded){
 
   document.querySelectorAll('.dc').forEach(c=>c.classList.remove('sel'));
   document.querySelectorAll('.dc').forEach(c=>{
-    if(c.getAttribute('onclick') && c.getAttribute('onclick').includes('${d}')){
+    if(c.getAttribute('onclick') && c.getAttribute('onclick').includes(d)){
       c.classList.add('sel');
     }
   });
 
-  const { data: deptInfo } = await SB
+  const { data: deptInfo, error: deptInfoErr } = await SB
     .from('user_profiles')
     .select('label')
     .eq('role','dept')
     .eq('dept', d)
-    .single();
+    .maybeSingle();
+
+  if(deptInfoErr){
+    console.log('DEPT INFO ERROR:', deptInfoErr);
+  }
 
   $s('dt-title', 'ملاحظات ' + (deptInfo?.label || d));
 
   let obs;
+
   if(preloaded){
     obs = preloaded.filter(o => o.dept === d);
   } else {
-    const { data } = await SB
+    const { data, error } = await SB
       .from('observations')
       .select('*')
       .eq('dept', d)
       .order('added',{ascending:false});
+
+    if(error){
+      console.log('SEL DEPT OBS ERROR:', error);
+      $('dt-list').innerHTML = '<div class="empty">خطأ في تحميل ملاحظات القسم</div>';
+      return;
+    }
+
     obs = data || [];
   }
 
