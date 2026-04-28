@@ -426,12 +426,6 @@ const CFG_KEY  = 'insp_cfg_v2';
 const USR_KEY  = 'insp_usr_v3';
 const EJS_KEY  = 'insp_ejs_v1';
 
-const DEFAULT_USERS = [
-  { key:'inspector',  pass:'inspect@2025', role:'admin', label:'المدير',           dept:'', email:'' },
-  { key:'env.makkah', pass:'mak@2025',     role:'dept',  label:'صحة البيئة مكة',  dept:'makkah', email:'' },
-  { key:'env.aseer',  pass:'ase@2025',     role:'dept',  label:'صحة البيئة عسير', dept:'aseer',  email:'' },
-  { key:'env.tabuk',  pass:'tab@2025',     role:'dept',  label:'صحة البيئة تبوك', dept:'tabuk',  email:'' },
-];
 
 const SRC_N  = { field:'تقرير ميداني', meeting:'اجتماع دوري', complaint:'شكوى / بلاغ', other:'أخرى' };
 const S_LBL  = { pending:'لم تُعالَج', progress:'قيد المعالجة', done:'مكتملة' };
@@ -488,27 +482,86 @@ async function initSB(url,key){
 function resetSB(){ if(!confirm('مسح بيانات الاتصال؟')) return; localStorage.removeItem(CFG_KEY); logout(); hide('login-screen'); show('setup'); }
 
 // ══ LOGIN ════════════════════════════════════════════════════
-function doLogin(){
-  USERS = loadUsers();
-  const u=$('li-u').value.trim().toLowerCase(), p=$('li-p').value;
-  if(!u||!p){ $('li-e').textContent='أدخل اسم المستخدم وكلمة المرور'; return; }
-  const usr = USERS.find(x=>x.key===u && x.pass===p);
-  if(!usr){ $('li-e').textContent='اسم المستخدم أو كلمة المرور غير صحيحة'; return; }
-  $('li-e').textContent='';
-  CU = usr;
-  hide('login-screen'); show('app');
+async function doLogin(){
+  const email = $('li-u').value.trim().toLowerCase();
+  const password = $('li-p').value;
+
+  if(!email || !password){
+    $('li-e').textContent = 'أدخل الإيميل وكلمة المرور';
+    return;
+  }
+
+  $('li-e').textContent = 'جاري تسجيل الدخول...';
+
+  const { data, error } = await SB.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+    $('li-e').textContent = 'الإيميل أو كلمة المرور غير صحيحة';
+    return;
+  }
+
+  const userId = data.user.id;
+
+  const { data: profile, error: profileError } = await SB
+    .from('user_profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if(profileError || !profile){
+    $('li-e').textContent = 'هذا المستخدم غير مربوط بالنظام';
+    return;
+  }
+
+  $('li-e').textContent = '';
+
+  CU = {
+    key: email,
+    role: profile.role,
+    label: profile.label,
+    dept: profile.dept || '',
+    email: email
+  };
+
+  hide('login-screen');
+  show('app');
+
   $s('nav-u', CU.label);
-  $s('nav-sub', CU.role==='admin'?'لوحة المدير':'واجهة القسم');
-  if(CU.role==='admin'){ show('av'); buildDeptFilter(); renderAdmin(); renderDeptTab(); }
-  else { show('dv'); $s('d-title','ملاحظات '+CU.label); renderDept(); }
+  $s('nav-sub', CU.role === 'admin' ? 'لوحة المدير' : 'واجهة القسم');
+
+  if(CU.role === 'admin'){
+    show('av');
+    buildDeptFilter();
+    renderAdmin();
+    renderDeptTab();
+  } else {
+    show('dv');
+    $s('d-title', 'ملاحظات ' + CU.label);
+    renderDept();
+  }
+
   checkReminder();
 }
 
-function logout(){
-  CU=null; openId=null; aFil='all'; dFil='all';
-  hide('app'); hide('av'); hide('dv');
-  $('rem').style.display='none';
-  $('li-u').value=''; $('li-p').value='';
+async function logout(){
+  await SB.auth.signOut();
+
+  CU = null;
+  openId = null;
+  aFil = 'all';
+  dFil = 'all';
+
+  hide('app');
+  hide('av');
+  hide('dv');
+
+  $('rem').style.display = 'none';
+  $('li-u').value = '';
+  $('li-p').value = '';
+
   show('login-screen');
 }
 
