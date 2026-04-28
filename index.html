@@ -612,16 +612,37 @@ async function renderAdmin(){
 }
 function af(el,f){ aFil=f; openId=null; chOn('a-chips',el); chOn('dept-filter-chips',el); renderAdmin(); }
 
-function buildDeptFilter(){
-  const c=$('dept-filter-chips'); c.innerHTML='';
-  getDepts().forEach(d=>{
-    const b=document.createElement('button');
-    b.className='chip'; b.textContent=d.label.replace('صحة البيئة ','');
-    b.onclick=()=>af(b,d.dept); c.appendChild(b);
+//new-000
+async function buildDeptFilter(){
+  const c = $('dept-filter-chips');
+  c.innerHTML = '';
+
+  const { data, error } = await SB
+    .from('user_profiles')
+    .select('*')
+    .eq('role', 'dept');
+
+  if(error || !data) return;
+
+  // الفلاتر
+  data.forEach(d=>{
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = d.label;
+    b.onclick = ()=>af(b, d.dept);
+    c.appendChild(b);
   });
-  // populate add form dept select
-  const sel=$('n-d'); sel.innerHTML='<option value="">— اختر —</option>';
-  getDepts().forEach(d=>{ const o=document.createElement('option'); o.value=d.dept; o.textContent=d.label; sel.appendChild(o); });
+
+  // تعبئة القائمة (ADD)
+  const sel = $('n-d');
+  sel.innerHTML = '<option value="">— اختر —</option>';
+
+  data.forEach(d=>{
+    const o = document.createElement('option');
+    o.value = d.dept;
+    o.textContent = d.label;
+    sel.appendChild(o);
+  });
 }
 
 // ══ DEPT TAB ════════════════════════════════════════════════
