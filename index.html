@@ -493,14 +493,17 @@ async function doLogin(){
 
   $('li-e').textContent = 'جاري تسجيل الدخول...';
 
+  console.log('SB:', SB);
+  console.log('email:', email);
+
   const { data, error } = await SB.auth.signInWithPassword({
     email,
     password
   });
 
 if(error){
+  console.log('LOGIN ERROR:', error);
   $('li-e').textContent = error.message;
-  console.log(error);
   return;
 }
 
