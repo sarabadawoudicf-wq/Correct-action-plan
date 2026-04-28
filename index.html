@@ -784,7 +784,7 @@ function actionTimeline(action){
     return '<div class="empty">لا توجد إجراءات محفوظة بعد</div>';
   }
 
-  return '<div class="timeline"> + action
+  return '<div class="timeline">' + action
     .split('-----------------------')
     .filter(x => x.trim())
     .map(x=>{
@@ -798,8 +798,8 @@ function actionTimeline(action){
         </div>
       `;
     }).join('') + '</div>';
-}  
-
+}
+  
 function card(o,isAdmin){
   const isOpen=openId===o.id;
   const tag=isAdmin?`<span class="dtag">${getDeptName(o.dept)}</span>`:'';
