@@ -368,7 +368,7 @@ create policy "open_access" on observations
       <div class="tp" id="tp-st">
         <div class="scard">
           <h3>إدارة المستخدمين والأقسام</h3>
-          <p>أضف أقساماً جديدة أو عدّل بيانات الدخول وإيميل التذكير لكل مستخدم.</p>
+          <p>إضافة أقسام جديدة أو تعديل بيانات الدخول وإيميل التذكير لكل مستخدم.</p>
           <div class="uhdr">
             <span class="uh">المستخدم</span>
             <span class="uh">اسم الدخول</span>
@@ -428,7 +428,7 @@ const EJS_KEY  = 'insp_ejs_v1';
   
 const DEFAULT_USERS = [];
 
-const SRC_N  = { field:'تقرير ميداني', meeting:'اجتماع دوري', complaint:'شكوى / بلاغ', other:'أخرى' };
+const SRC_N  = { field:'المخالفات', meeting:'الزيارات', complaint:'الاعتراضات', other:'أخرى' };
 const S_LBL  = { pending:'لم تُعالَج', progress:'قيد المعالجة', done:'مكتملة' };
 const S_CLS  = { pending:'sp0', progress:'sp1', done:'sp2' };
 const P_CLS  = { high:'ph2', mid:'pm', low:'plo' };
@@ -647,39 +647,98 @@ async function buildDeptFilter(){
 
 // ══ DEPT TAB ════════════════════════════════════════════════
 async function renderDeptTab(){
-  const {data:all}=await SB.from('observations').select('*');
-  if(!all) return;
-  const depts=getDepts();
-  if(!selDept && depts.length) selDept=depts[0].dept;
-  $('dept-grid').innerHTML=depts.map(d=>{
-    const obs=all.filter(o=>o.dept===d.dept);
-    const don=obs.filter(o=>o.status==='done').length, prg=obs.filter(o=>o.status==='progress').length;
-    const pnd=obs.filter(o=>o.status==='pending').length, pct=obs.length?Math.round(don/obs.length*100):0;
+  const { data: depts, error: deptErr } = await SB
+    .from('user_profiles')
+    .select('dept,label,role')
+    .eq('role','dept');
+
+  if(deptErr){
+    console.log('DEPT TAB PROFILES ERROR:', deptErr);
+    $('dept-grid').innerHTML = '<div class="empty">خطأ في تحميل الأقسام</div>';
+    return;
+  }
+
+  const { data: all, error: obsErr } = await SB
+    .from('observations')
+    .select('*');
+
+  if(obsErr){
+    console.log('DEPT TAB OBS ERROR:', obsErr);
+    $('dt-list').innerHTML = '<div class="empty">خطأ في تحميل الملاحظات</div>';
+    return;
+  }
+
+  if(!depts || !depts.length){
+    $('dept-grid').innerHTML = '<div class="empty">لا توجد أقسام مضافة</div>';
+    $('dt-title').textContent = '—';
+    $('dt-list').innerHTML = '';
+    return;
+  }
+
+  if(!selDept) selDept = depts[0].dept;
+
+  $('dept-grid').innerHTML = depts.map(d=>{
+    const obs = (all || []).filter(o => o.dept === d.dept);
+    const don = obs.filter(o=>o.status==='done').length;
+    const prg = obs.filter(o=>o.status==='progress').length;
+    const pnd = obs.filter(o=>o.status==='pending').length;
+    const pct = obs.length ? Math.round(don / obs.length * 100) : 0;
+
     return `<div class="dc${d.dept===selDept?' sel':''}" onclick="selDD('${d.dept}')">
       <div class="dn">${d.label}</div>
-      <div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--mut)">الإنجاز</span><span style="font-size:12px;font-weight:600;color:var(--navy)">${pct}%</span></div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:11px;color:var(--mut)">الإنجاز</span>
+        <span style="font-size:12px;font-weight:600;color:var(--navy)">${pct}%</span>
+      </div>
       <div class="dbw"><div class="db" style="width:${pct}%"></div></div>
       <div class="drow">
         <div class="dm"><div class="dmv r">${pnd}</div><div class="dml">معلق</div></div>
         <div class="dm"><div class="dmv a">${prg}</div><div class="dml">جارٍ</div></div>
         <div class="dm"><div class="dmv g">${don}</div><div class="dml">منجز</div></div>
         <div class="dm"><div class="dmv">${obs.length}</div><div class="dml">إجمالي</div></div>
-      </div></div>`;
+      </div>
+    </div>`;
   }).join('');
-  if(selDept) selDD(selDept, all);
+
+  selDD(selDept, all);
 }
 
 async function selDD(d, preloaded){
-  selDept=d; openId=null;
-  document.querySelectorAll('.dc').forEach(c=>c.classList.remove('sel'));
-  document.querySelectorAll('.dc').forEach(c=>{ if(c.onclick&&c.onclick.toString().includes(`'${d}'`)) c.classList.add('sel'); });
-  $s('dt-title','ملاحظات '+getDeptName(d));
-  let obs;
-  if(preloaded) obs=preloaded.filter(o=>o.dept===d);
-  else { const {data}=await SB.from('observations').select('*').eq('dept',d).order('added',{ascending:false}); obs=data||[]; }
-  $('dt-list').innerHTML=obs.filter(o=>o.dept===d).length?obs.filter(o=>o.dept===d).map(o=>card(o,true)).join(''):'<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات لهذا القسم</div>';
-}
+  selDept = d;
+  openId = null;
 
+  document.querySelectorAll('.dc').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.dc').forEach(c=>{
+    if(c.getAttribute('onclick') && c.getAttribute('onclick').includes('${d}')){
+      c.classList.add('sel');
+    }
+  });
+
+  const { data: deptInfo } = await SB
+    .from('user_profiles')
+    .select('label')
+    .eq('role','dept')
+    .eq('dept', d)
+    .single();
+
+  $s('dt-title', 'ملاحظات ' + (deptInfo?.label || d));
+
+  let obs;
+  if(preloaded){
+    obs = preloaded.filter(o => o.dept === d);
+  } else {
+    const { data } = await SB
+      .from('observations')
+      .select('*')
+      .eq('dept', d)
+      .order('added',{ascending:false});
+    obs = data || [];
+  }
+
+  $('dt-list').innerHTML = obs.length
+    ? obs.map(o=>card(o,true)).join('')
+    : '<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات لهذا القسم</div>';
+}
 // ══ ADD OBS ══════════════════════════════════════════════════
 async function addObs(){
   const dept=$('n-d').value, short=$('n-sh').value.trim();
