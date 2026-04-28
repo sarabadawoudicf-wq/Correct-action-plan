@@ -460,22 +460,20 @@ $('n-dt').valueAsDate = new Date();
 
 window.onload = function(){
   USERS = loadUsers();
-  const cfg = JSON.parse(localStorage.getItem(CFG_KEY)||'{}');
-  if(cfg.url && cfg.key) initSB(cfg.url, cfg.key);
+  initSB(SUPABASE_URL, SUPABASE_KEY);
   loadEJSSettings();
 };
 
 // ══ SUPABASE ═════════════════════════════════════════════════
 function copySQL(){ navigator.clipboard.writeText($('sql-box').textContent); toast('تم نسخ الكود ✓'); }
-
+const SUPABASE_URL = 'https://wrxnwqycukusotagvqpe.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_EnWCdGcw3g9HZJctY0wcEw_iHhCvqVZ';
+  
 async function connectSB(){
-  const url=$('sup-url').value.trim(), key=$('sup-key').value.trim();
-  const err=$('setup-err');
-  if(!url||!key){ err.textContent='أدخل URL و Key'; return; }
-  err.textContent='جاري الاتصال...';
-  const ok = await initSB(url,key);
-  if(ok){ localStorage.setItem(CFG_KEY,JSON.stringify({url,key})); }
-  else { err.textContent='تعذّر الاتصال — تحقق من البيانات وتأكد من تشغيل الكود في SQL Editor'; }
+  const ok = await initSB(SUPABASE_URL, SUPABASE_KEY);
+  if(!ok){
+    $('setup-err').textContent='تعذّر الاتصال';
+  }
 }
 
 async function initSB(url,key){
