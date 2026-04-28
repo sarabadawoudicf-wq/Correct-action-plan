@@ -783,7 +783,7 @@ async function loadActions(id){
   const box = $('acts'+id);
   if(!box) return;
 
-  box.innerHTML = 'جاري التحميل...';
+  box.innerHTML = '<div class="loading-row">جاري تحميل الإجراءات...</div>';
 
   const { data, error } = await SB
     .from('observation_actions')
@@ -793,12 +793,12 @@ async function loadActions(id){
 
   if(error){
     console.log('ACTIONS ERROR:', error);
-    box.innerHTML = 'خطأ في تحميل الإجراءات';
+    box.innerHTML = '<div class="empty">خطأ في تحميل الإجراءات</div>';
     return;
   }
 
   if(!data || !data.length){
-    box.innerHTML = 'لا توجد إجراءات بعد';
+    box.innerHTML = '<div class="empty">لا توجد إجراءات محفوظة بعد</div>';
     return;
   }
 
