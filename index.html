@@ -791,12 +791,11 @@ function actionTimeline(action){
       const lines = x.trim().split('\n');
       const meta = lines.shift() || '';
       const text = lines.join('\n');
-      return `
-        <div class="titem">
-          <div class="tmeta">${meta}</div>
-          <div class="ttext">${text}</div>
-        </div>
-      `;
+
+      return '<div class="titem">' +
+               '<div class="tmeta">' + meta + '</div>' +
+               '<div class="ttext">' + text + '</div>' +
+             '</div>';
     }).join('') + '</div>';
 }
   
