@@ -851,47 +851,43 @@ async function saveCard(id){
     return;
   }
 
-  const { data: old, error: readError } = await SB
+  const { error: insertError } = await SB
+    .from('observation_actions')
+    .insert({
+      observation_id: id,
+      user_id: CU?.id || null,
+      status: newStatus,
+      action_text: newAction
+    });
+
+  if(insertError){
+    toast('خطأ في حفظ الإجراء');
+    console.log(insertError);
+    return;
+  }
+
+  const { error: updateError } = await SB
     .from('observations')
-    .select('action')
-    .eq('id', id)
-    .single();
+    .update({
+      status: newStatus,
+      deadline: newDeadline
+    })
+    .eq('id', id);
 
-  if(readError){
-    toast('خطأ في قراءة الإجراء السابق');
-    console.log(readError);
+  if(updateError){
+    toast('تم حفظ الإجراء لكن حدث خطأ في تحديث الحالة');
+    console.log(updateError);
     return;
   }
 
-  const now = new Date();
-  const dateTime =
-    now.toLocaleDateString('ar-SA') + ' - ' +
-    now.toLocaleTimeString('ar-SA');
-
-  const statusLabel = S_LBL[newStatus] || newStatus;
-
-  const oldAction = old?.action ? old.action.trim() : '';
-
-  const combinedAction =
-`${dateTime} | ${statusLabel}
-${newAction}${oldAction ? '\n\n-----------------------\n' + oldAction : ''}`;
-
-  const { error } = await SB.from('observations').update({
-    status: newStatus,
-    action: combinedAction,
-    deadline: newDeadline
-  }).eq('id', id);
-
-  if(error){
-    toast('خطأ في الحفظ');
-    console.log(error);
-    return;
-  }
-
+  $('ac'+id).value = '';
   toast('تم حفظ الإجراء ✓');
+
   openId = id;
   rerender();
-}
+}  
+
+  
 
 async function delObs(id,e){
   e.stopPropagation();
