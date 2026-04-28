@@ -498,10 +498,11 @@ async function doLogin(){
     password
   });
 
-  if(error){
-    $('li-e').textContent = 'الإيميل أو كلمة المرور غير صحيحة';
-    return;
-  }
+if(error){
+  $('li-e').textContent = error.message;
+  console.log(error);
+  return;
+}
 
   const userId = data.user.id;
 
