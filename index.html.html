@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام متابعة الخطة التصحيحية — إدارة التفتيش</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap');
+:root{
+  --navy:#1b2b52;--navy2:#243668;--navy3:#2e437e;
+  --gold:#c8962a;--gold2:#e8b84b;
+  --w:#fff;--surf:#f6f8fd;--bg:#edf0f9;--bdr:#dde3f2;
+  --txt:#1b2b52;--mut:#6b78a0;
+  --red:#be3232;--amb:#c47f10;--grn:#1a7a48;
+  --rbg:#fdf0f0;--abg:#fdf8ec;--gbg:#edf7f2;
+  --sh:0 2px 14px rgba(27,43,82,.08);--shm:0 4px 28px rgba(27,43,82,.13);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;direction:rtl}
+
+/* ── SETUP ───────────────────────────────────────────────── */
+#setup{position:fixed;inset:0;background:rgba(10,15,35,.9);z-index:1000;display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;}
+.setup-box{background:var(--w);border-radius:18px;padding:36px;width:520px;max-width:95vw;}
+.setup-box h2{font-size:17px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+.setup-box p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.6;}
+.sf{margin-bottom:14px;}
+.sf label{display:block;font-size:12px;color:var(--mut);margin-bottom:5px;font-weight:500;}
+.sf input{width:100%;padding:10px 12px;border:1px solid var(--bdr);border-radius:9px;font-family:inherit;font-size:13px;color:var(--txt);background:var(--surf);direction:ltr;text-align:left;outline:none;transition:border-color .2s;}
+.sf input:focus{border-color:var(--navy3);}
+.sql{background:#f0f4ff;border:1px solid #c5d0f0;border-radius:9px;padding:12px;font-family:monospace;font-size:11px;color:#2a3a6e;direction:ltr;text-align:left;line-height:1.7;margin-bottom:12px;white-space:pre-wrap;word-break:break-all;max-height:160px;overflow-y:auto;}
+.bcopy{background:var(--navy);color:#fff;border:none;padding:6px 14px;border-radius:7px;font-family:inherit;font-size:12px;cursor:pointer;margin-bottom:14px;}
+.bconn{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;}
+.setup-err{font-size:12px;color:var(--red);margin-top:8px;min-height:16px;}
+
+/* ── LOGIN ───────────────────────────────────────────────── */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 60%,#243668,#1b2b52 60%,#111e3a);position:relative;overflow:hidden;}
+.lr{position:absolute;border-radius:50%;border:1px solid rgba(200,150,42,.11);pointer-events:none;}
+.lr1{width:700px;height:700px;top:-300px;right:-200px;}
+.lr2{width:450px;height:450px;bottom:-150px;left:-150px;}
+.lc{background:rgba(255,255,255,.055);backdrop-filter:blur(22px);border:1px solid rgba(200,150,42,.22);border-radius:22px;padding:48px 42px;width:420px;max-width:95vw;position:relative;z-index:1;}
+.lic{width:58px;height:58px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:15px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:26px;}
+.lit{font-size:20px;font-weight:600;color:#fff;text-align:center;margin-bottom:4px;}
+.lis{font-size:12.5px;color:rgba(255,255,255,.42);text-align:center;margin-bottom:34px;line-height:1.7;}
+.ll{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:5px;display:block;}
+.li{width:100%;padding:11px 14px;border-radius:10px;border:1px solid rgba(200,150,42,.28);background:rgba(255,255,255,.07);color:#fff;font-family:inherit;font-size:14px;direction:rtl;outline:none;transition:border-color .2s;margin-bottom:13px;}
+.li:focus{border-color:var(--gold);}
+.li::placeholder{color:rgba(255,255,255,.28);}
+.lb{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;}
+.lb:hover{opacity:.9;}
+.le{font-size:12.5px;color:#ff8585;margin-top:10px;text-align:center;min-height:16px;}
+
+/* ── NAV ─────────────────────────────────────────────────── */
+#app{display:none;}
+.nav{background:var(--navy);height:60px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.nbi{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.nbt{font-size:14px;font-weight:600;color:#fff;}
+.nbs{font-size:11px;color:rgba(255,255,255,.38);}
+.up{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:4px 13px;font-size:12px;color:rgba(255,255,255,.82);display:flex;align-items:center;gap:6px;}
+.ud{width:7px;height:7px;border-radius:50%;background:var(--gold2);}
+.nb{background:transparent;border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:5px 12px;color:rgba(255,255,255,.55);font-family:inherit;font-size:12px;cursor:pointer;transition:all .18s;}
+.nb:hover{background:rgba(255,255,255,.08);color:#fff;}
+.wrap{padding:26px;max-width:1080px;margin:0 auto;}
+
+/* ── REMINDER BANNER ─────────────────────────────────────── */
+.rban{background:var(--abg);border:1px solid #e8c040;border-right:4px solid var(--amb);border-radius:11px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;}
+.rtxt{font-size:13px;color:#6a4800;line-height:1.6;flex:1;}
+.rcls{background:none;border:none;cursor:pointer;font-size:20px;color:#a07000;line-height:1;}
+
+/* ── STATS ───────────────────────────────────────────────── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px;}
+.sc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;padding:17px 19px;box-shadow:var(--sh);position:relative;overflow:hidden;}
+.sc::after{content:'';position:absolute;top:0;right:0;width:4px;height:100%;}
+.sc.tot::after{background:var(--navy3);}.sc.red::after{background:var(--red);}
+.sc.amb::after{background:var(--amb);}.sc.grn::after{background:var(--grn);}
+.sl{font-size:11.5px;color:var(--mut);margin-bottom:6px;}
+.sv{font-size:26px;font-weight:600;}
+.sc.red .sv{color:var(--red);}.sc.amb .sv{color:var(--amb);}.sc.grn .sv{color:var(--grn);}
+.pw{margin-bottom:22px;}
+.phx{display:flex;justify-content:space-between;margin-bottom:5px;}
+.plx{font-size:12.5px;color:var(--mut);}
+.pp{font-size:13px;font-weight:600;color:var(--navy);}
+.pt{height:7px;background:var(--bg);border-radius:99px;overflow:hidden;}
+.pf{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--grn),#2ecc71);transition:width .5s;}
+
+/* ── CHIPS ───────────────────────────────────────────────── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.st{font-size:15px;font-weight:600;color:var(--navy);}
+.chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{font-size:11.5px;padding:4px 13px;border-radius:99px;border:1px solid var(--bdr);background:var(--w);color:var(--mut);cursor:pointer;font-family:inherit;transition:all .14s;}
+.chip:hover{border-color:var(--navy);color:var(--navy);}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+.chip.on.r{background:var(--red);border-color:var(--red);}
+.chip.on.a{background:var(--amb);border-color:var(--amb);}
+.chip.on.g{background:var(--grn);border-color:var(--grn);}
+.bxl{padding:6px 14px;border-radius:8px;border:1px solid var(--bdr);background:var(--w);color:var(--txt);font-family:inherit;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .14s;}
+.bxl:hover{background:var(--surf);}
+
+/* ── OBS CARDS ───────────────────────────────────────────── */
+.olist{display:flex;flex-direction:column;gap:10px;}
+.oc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;overflow:hidden;box-shadow:var(--sh);transition:box-shadow .18s;}
+.oc:hover{box-shadow:var(--shm);}
+.oh{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none;}
+.on2{font-size:11px;font-weight:600;color:var(--mut);min-width:28px;}
+.op{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ph2{background:var(--red);}.pm{background:var(--amb);}.plo{background:var(--grn);}
+.os2{flex:1;font-size:13.5px;color:var(--txt);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.om{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.od{font-size:11px;color:var(--mut);}
+.spill{font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;}
+.sp0{background:var(--rbg);color:var(--red);}.sp1{background:var(--abg);color:var(--amb);}.sp2{background:var(--gbg);color:var(--grn);}
+.ochv{font-size:10px;color:var(--mut);transition:transform .18s;flex-shrink:0;}
+.ochv.open{transform:rotate(90deg);}
+.ob{display:none;padding:0 18px 18px;border-top:1px solid var(--bdr);}
+.ob.open{display:block;}
+.odt{font-size:13px;color:var(--mut);line-height:1.7;padding:13px 0 11px;border-bottom:1px dashed var(--bdr);margin-bottom:13px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fg label{font-size:11.5px;color:var(--mut);font-weight:500;}
+.fg select,.fg input[type=date],.fg textarea{padding:8px 11px;border:1px solid var(--bdr);border-radius:8px;font-family:inherit;font-size:13px;color:var(--txt);background:var(--surf);direction:rtl;outline:none;transition:border-color .14s;width:100%;}
+.fg select:focus,.fg input[type=date]:focus,.fg textarea:focus{border-color:var(--navy3);background:var(--w);}
+.fg textarea{resize:vertical;min-height:66px;line-height:1.6;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px;}
+.ff{grid-column:1/-1;}
+.fa{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+.bdel{background:none;border:none;color:var(--red);font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;font-family:inherit;transition:background .14s;}
+.bdel:hover{background:var(--rbg);}
+.bsv{padding:7px 20px;border-radius:8px;border:none;background:var(--navy);color:#fff;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;}
+.bsv:hover{background:var(--navy2);}
+.dtag{font-size:11px;background:var(--bg);color:var(--mut);padding:2px 8px;border-radius:99px;}
+.stag{font-size:10px;color:var(--mut);}
+.loading-row{text-align:center;padding:28px;font-size:13px;color:var(--mut);}
+
+/* ── ADMIN TABS ───────────────────────────────────────────── */
+.atabs{display:flex;border-bottom:2px solid var(--bdr);margin-bottom:20px;gap:0;overflow-x:auto;}
+.atab{padding:10px 18px;font-size:13px;font-family:inherit;cursor:pointer;background:none;border:none;color:var(--mut);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .14s;font-weight:500;white-space:nowrap;}
+.atab.on{color:var(--navy);border-bottom-color:var(--navy);}
+.tp{display:none;}.tp.show{display:block;}
+
+/* ── ADD FORM ────────────────────────────────────────────── */
+.acard{background:var(--w);border:1px solid var(--bdr);border-radius:14px;padding:24px;box-shadow:var(--sh);max-width:650px;}
+.acard h3{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:16px;}
+.fg2{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.fg2 label{font-size:12px;color:var(--mut);font-weight:500;}
+.fg2 select,.fg2 input,.fg2 textarea{padding:8px 11px;border:1px solid var(--bdr);border-radius:8px;font-family:inherit;font-size:13px;color:var(--txt);background:var(--surf);direction:rtl;outline:none;width:100%;}
+.fg2 select:focus,.fg2 input:focus,.fg2 textarea:focus{border-color:var(--navy3);}
+.fg2 textarea{resize:vertical;min-height:80px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.badd{padding:10px 26px;background:var(--navy);color:#fff;border:none;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:500;cursor:pointer;}
+.badd:hover{background:var(--navy2);}
+
+/* ── DEPT CARDS ───────────────────────────────────────────── */
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:13px;margin-bottom:24px;}
+.dc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;padding:17px;box-shadow:var(--sh);cursor:pointer;transition:box-shadow .18s,border-color .18s;}
+.dc:hover{box-shadow:var(--shm);}
+.dc.sel{border-color:var(--navy);}
+.dn{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:9px;}
+.dbw{height:5px;background:var(--bg);border-radius:99px;margin:5px 0 10px;overflow:hidden;}
+.db{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--grn),#2ecc71);transition:width .5s;}
+.drow{display:flex;gap:12px;}
+.dm{text-align:center;}
+.dmv{font-size:17px;font-weight:600;}
+.dmv.r{color:var(--red);}.dmv.a{color:var(--amb);}.dmv.g{color:var(--grn);}
+.dml{font-size:10px;color:var(--mut);}
+
+/* ── SETTINGS ─────────────────────────────────────────────── */
+.scard{background:var(--w);border:1px solid var(--bdr);border-radius:14px;padding:24px;box-shadow:var(--sh);max-width:680px;margin-bottom:20px;}
+.scard h3{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:4px;}
+.scard p{font-size:13px;color:var(--mut);margin-bottom:16px;line-height:1.6;}
+.urow{display:grid;grid-template-columns:130px 1fr 1fr 1fr 36px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bdr);}
+.urow:last-of-type{border-bottom:none;}
+.uhdr{display:grid;grid-template-columns:130px 1fr 1fr 1fr 36px;gap:8px;padding-bottom:7px;border-bottom:1px solid var(--bdr);margin-bottom:2px;}
+.uh{font-size:11px;color:var(--mut);font-weight:500;}
+.ulbl{font-size:13px;font-weight:500;color:var(--txt);}
+.ui{padding:7px 9px;border:1px solid var(--bdr);border-radius:7px;font-family:inherit;font-size:12px;color:var(--txt);background:var(--surf);direction:ltr;text-align:left;outline:none;width:100%;}
+.ui:focus{border-color:var(--navy3);}
+.ui.rtl{direction:rtl;text-align:right;}
+.bdel2{background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:2px 4px;border-radius:6px;line-height:1;transition:background .14s;}
+.bdel2:hover{background:var(--rbg);}
+.badd2{padding:8px 18px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;font-family:inherit;font-size:12.5px;color:var(--txt);cursor:pointer;transition:background .14s;margin-top:12px;}
+.badd2:hover{background:var(--bg);}
+.bset{padding:9px 22px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;margin-top:14px;}
+.snote{font-size:12px;color:#6a4800;margin-top:10px;line-height:1.6;background:var(--abg);border-radius:8px;padding:10px 13px;}
+
+/* EmailJS settings */
+.ejs-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.bsend{padding:8px 18px;background:var(--grn);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:background .14s;}
+.bsend:hover{opacity:.88;}
+.bsend:disabled{opacity:.5;cursor:not-allowed;}
+.ejs-note{font-size:12px;color:var(--mut);margin-top:10px;line-height:1.6;}
+
+/* EMPTY / TOAST */
+.empty{text-align:center;padding:42px 20px;color:var(--mut);font-size:13.5px;}
+.ei{font-size:36px;margin-bottom:10px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--navy);color:#fff;padding:9px 22px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;z-index:9999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:600px){
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .fgrid,.frow,.ejs-fields{grid-template-columns:1fr;}
+  .urow,.uhdr{grid-template-columns:1fr 1fr 1fr 36px;}
+  .urow .ulbl{display:none;}
+  .wrap{padding:14px;}.nav{padding:0 14px;}.lc{padding:30px 18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP OVERLAY ════════════════════════════════════════ -->
+<div id="setup">
+  <div class="setup-box">
+    <h2>🔧 إعداد قاعدة البيانات — مرة واحدة فقط</h2>
+    <p>أنشئ مشروعاً مجانياً على <strong>supabase.com</strong> ثم شغّل هذا الكود في SQL Editor، وأدخل بيانات الاتصال.</p>
+    <p style="font-size:12px;color:var(--mut);margin-bottom:8px;font-weight:500;">① الصق هذا الكود في Supabase → SQL Editor → Run</p>
+    <div class="sql" id="sql-box">create table if not exists observations (
+  id bigserial primary key,
+  dept text not null,
+  priority text default 'mid',
+  source text default 'field',
+  obs_date date,
+  added timestamptz default now(),
+  short text not null,
+  full_text text default '',
+  status text default 'pending',
+  action text default '',
+  deadline date
+);
+alter table observations enable row level security;
+create policy "open_access" on observations
+  for all using (true) with check (true);</div>
+    <button class="bcopy" onclick="copySQL()">نسخ الكود</button>
+    <p style="font-size:12px;color:var(--mut);margin-bottom:8px;font-weight:500;">② أدخل بيانات الاتصال من Project Settings → API</p>
+    <div class="sf"><label>Project URL</label><input id="sup-url" placeholder="https://xxxx.supabase.co" dir="ltr"></div>
+    <div class="sf"><label>anon public key</label><input id="sup-key" placeholder="eyJhbGciOiJIUzI1NiIs..." dir="ltr"></div>
+    <button class="bconn" onclick="connectSB()">اتصل وابدأ النظام</button>
+    <div class="setup-err" id="setup-err"></div>
+  </div>
+</div>
+
+<!-- ══ LOGIN ════════════════════════════════════════════════ -->
+<div id="login-screen" style="display:none;">
+  <div class="lr lr1"></div><div class="lr lr2"></div>
+  <div class="lc">
+    <div class="lic">🔍</div>
+    <div class="lit">نظام متابعة الخطة التصحيحية</div>
+    <div class="lis">إدارة التفتيش — صحة البيئة<br>أدخل بيانات الدخول للمتابعة</div>
+    <label class="ll">اسم المستخدم</label>
+    <input class="li" id="li-u" type="text" placeholder="اسم المستخدم" autocomplete="username">
+    <label class="ll">كلمة المرور</label>
+    <input class="li" id="li-p" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+    <button class="lb" onclick="doLogin()">دخول إلى النظام</button>
+    <div class="le" id="li-e"></div>
+  </div>
+</div>
+
+<!-- ══ APP ═══════════════════════════════════════════════════ -->
+<div id="app">
+  <nav class="nav">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="nbi">🔍</div>
+      <div><div class="nbt">الخطة التصحيحية</div><div class="nbs" id="nav-sub"></div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:9px;">
+      <div class="up"><span class="ud"></span><span id="nav-u"></span></div>
+      <button class="nb" onclick="logout()">خروج</button>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <div class="rban" id="rem" style="display:none;">
+      <span style="font-size:18px;">⏰</span>
+      <div class="rtxt" id="rem-txt"></div>
+      <button class="rcls" onclick="this.parentElement.style.display='none'">×</button>
+    </div>
+
+    <!-- DEPT VIEW -->
+    <div id="dv" style="display:none;">
+      <div class="stats">
+        <div class="sc tot"><div class="sl">إجمالي الملاحظات</div><div class="sv" id="d-tot">—</div></div>
+        <div class="sc red"><div class="sl">لم تُعالَج</div><div class="sv" id="d-pnd">—</div></div>
+        <div class="sc amb"><div class="sl">قيد المعالجة</div><div class="sv" id="d-prg">—</div></div>
+        <div class="sc grn"><div class="sl">مكتملة</div><div class="sv" id="d-don">—</div></div>
+      </div>
+      <div class="pw">
+        <div class="phx"><span class="plx">نسبة الإنجاز</span><span class="pp" id="d-pct">—</span></div>
+        <div class="pt"><div class="pf" id="d-bar" style="width:0%"></div></div>
+      </div>
+      <div class="sh">
+        <span class="st" id="d-title">ملاحظاتك التصحيحية</span>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <div class="chips" id="d-chips">
+            <button class="chip on" onclick="df(this,'all')">الكل</button>
+            <button class="chip r" onclick="df(this,'pending')">لم تُعالَج</button>
+            <button class="chip a" onclick="df(this,'progress')">قيد المعالجة</button>
+            <button class="chip g" onclick="df(this,'done')">مكتملة</button>
+          </div>
+          <button class="bxl" onclick="exportXL(false)">⬇ Excel</button>
+        </div>
+      </div>
+      <div class="olist" id="d-list"></div>
+    </div>
+
+    <!-- ADMIN VIEW -->
+    <div id="av" style="display:none;">
+      <div class="atabs">
+        <button class="atab on" onclick="stab('ov',this)">نظرة عامة</button>
+        <button class="atab" onclick="stab('ad',this)">إضافة ملاحظة</button>
+        <button class="atab" onclick="stab('dt',this)">تفصيل الأقسام</button>
+        <button class="atab" onclick="stab('st',this)">الإعدادات</button>
+        <button class="atab" onclick="stab('em',this)">إرسال تذكير</button>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div class="tp show" id="tp-ov">
+        <div class="stats">
+          <div class="sc tot"><div class="sl">إجمالي الملاحظات</div><div class="sv" id="a-tot">—</div></div>
+          <div class="sc red"><div class="sl">لم تُعالَج</div><div class="sv" id="a-pnd">—</div></div>
+          <div class="sc amb"><div class="sl">قيد المعالجة</div><div class="sv" id="a-prg">—</div></div>
+          <div class="sc grn"><div class="sl">مكتملة</div><div class="sv" id="a-don">—</div></div>
+        </div>
+        <div class="pw">
+          <div class="phx"><span class="plx">نسبة الإنجاز الكلية</span><span class="pp" id="a-pct">—</span></div>
+          <div class="pt"><div class="pf" id="a-bar" style="width:0%"></div></div>
+        </div>
+        <div class="sh">
+          <span class="st">جميع الملاحظات</span>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div class="chips" id="a-chips">
+              <button class="chip on" onclick="af(this,'all')">الكل</button>
+              <button class="chip r" onclick="af(this,'pending')">لم تُعالَج</button>
+              <button class="chip a" onclick="af(this,'progress')">قيد المعالجة</button>
+              <button class="chip g" onclick="af(this,'done')">مكتملة</button>
+            </div>
+            <div class="chips" id="dept-filter-chips"></div>
+            <button class="bxl" onclick="exportXL(true)">⬇ Excel</button>
+          </div>
+        </div>
+        <div class="olist" id="a-list"></div>
+      </div>
+
+      <!-- ADD -->
+      <div class="tp" id="tp-ad">
+        <div class="acard">
+          <h3>إضافة ملاحظة جديدة</h3>
+          <div class="frow" style="margin-bottom:12px;">
+            <div class="fg2"><label>القسم المعني</label><select id="n-d"><option value="">— اختر —</option></select></div>
+            <div class="fg2"><label>الأولوية</label><select id="n-p"><option value="high">عالية</option><option value="mid">متوسطة</option><option value="low">منخفضة</option></select></div>
+            <div class="fg2"><label>مصدر الملاحظة</label>
+              <select id="n-s"><option value="field">تقرير مفتش ميداني</option><option value="meeting">اجتماع دوري</option><option value="complaint">شكوى / بلاغ</option><option value="other">أخرى</option></select>
+            </div>
+            <div class="fg2"><label>تاريخ الملاحظة</label><input type="date" id="n-dt"></div>
+          </div>
+          <div class="fg2"><label>عنوان الملاحظة (مختصر)</label><input type="text" id="n-sh" placeholder="وصف مختصر يظهر في القائمة"></div>
+          <div class="fg2" style="margin-top:10px;"><label>تفاصيل الملاحظة</label><textarea id="n-fu" rows="4" placeholder="النص الكامل للملاحظة..."></textarea></div>
+          <div style="margin-top:14px;"><button class="badd" onclick="addObs()">إضافة الملاحظة</button></div>
+        </div>
+      </div>
+
+      <!-- DEPT DETAIL -->
+      <div class="tp" id="tp-dt">
+        <div class="dgrid" id="dept-grid"></div>
+        <div class="sh"><span class="st" id="dt-title">—</span></div>
+        <div class="olist" id="dt-list"></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="tp" id="tp-st">
+        <div class="scard">
+          <h3>إدارة المستخدمين والأقسام</h3>
+          <p>أضف أقساماً جديدة أو عدّل بيانات الدخول وإيميل التذكير لكل مستخدم.</p>
+          <div class="uhdr">
+            <span class="uh">المستخدم</span>
+            <span class="uh">اسم الدخول</span>
+            <span class="uh">كلمة المرور</span>
+            <span class="uh">إيميل التذكير</span>
+            <span></span>
+          </div>
+          <div id="user-rows"></div>
+          <button class="badd2" onclick="addUserRow()">+ إضافة قسم جديد</button>
+          <div style="margin-top:14px;"><button class="bset" onclick="saveSettings()">حفظ جميع التغييرات</button></div>
+          <div class="snote">⚠️ بعد حفظ بيانات مستخدم جديد، أرسل له الرابط واسم الدخول وكلمة المرور.</div>
+        </div>
+        <div class="scard">
+          <h3>إعادة ضبط الاتصال</h3>
+          <p>إذا أردت تغيير مشروع Supabase.</p>
+          <button style="padding:8px 18px;background:var(--red);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13px;cursor:pointer;" onclick="resetSB()">إعادة الضبط</button>
+        </div>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="tp" id="tp-em">
+        <div class="scard">
+          <h3>إعداد إرسال التذكير بالإيميل</h3>
+          <p>استخدم <strong>EmailJS</strong> (مجاني، 200 إيميل/شهر). أنشئ حساباً على emailjs.com، أنشئ خدمة بريد وقالب، ثم أدخل البيانات هنا.</p>
+          <div class="ejs-fields">
+            <div class="fg2"><label>Service ID</label><input type="text" id="ejs-sid" placeholder="service_xxxxxxx" dir="ltr"></div>
+            <div class="fg2"><label>Template ID</label><input type="text" id="ejs-tid" placeholder="template_xxxxxxx" dir="ltr"></div>
+            <div class="fg2"><label>Public Key</label><input type="text" id="ejs-key" placeholder="xxxxxxxxxxxxxxxxxxxxxx" dir="ltr"></div>
+            <div class="fg2"><label>اسم المرسل (يظهر في الإيميل)</label><input type="text" id="ejs-name" placeholder="إدارة التفتيش" class="rtl"></div>
+          </div>
+          <button class="bset" onclick="saveEJS()">حفظ إعدادات الإيميل</button>
+          <div style="margin-top:18px;border-top:1px solid var(--bdr);padding-top:16px;">
+            <p style="font-size:13px;font-weight:500;color:var(--navy);margin-bottom:10px;">إرسال التذكير</p>
+            <div id="email-dept-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+            <button class="bsend" id="send-all-btn" onclick="sendAllReminders()">إرسال تذكير لجميع الأقسام التي لديها ملاحظات معلقة</button>
+          </div>
+          <div class="ejs-note">
+            <strong>كيف تضبط القالب في EmailJS:</strong><br>
+            عند إنشاء Template استخدم هذه المتغيرات:<br>
+            <code style="font-family:monospace;font-size:11px;">{{to_email}}</code> — إيميل القسم &nbsp;|&nbsp;
+            <code style="font-family:monospace;font-size:11px;">{{dept_name}}</code> — اسم القسم &nbsp;|&nbsp;
+            <code style="font-family:monospace;font-size:11px;">{{pending_count}}</code> — عدد الملاحظات المعلقة &nbsp;|&nbsp;
+            <code style="font-family:monospace;font-size:11px;">{{from_name}}</code> — اسم المرسل
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ CONSTANTS ═══════════════════════════════════════════════
+const CFG_KEY  = 'insp_cfg_v2';
+const USR_KEY  = 'insp_usr_v3';
+const EJS_KEY  = 'insp_ejs_v1';
+
+const DEFAULT_USERS = [
+  { key:'inspector',  pass:'inspect@2025', role:'admin', label:'المدير',           dept:'', email:'' },
+  { key:'env.makkah', pass:'mak@2025',     role:'dept',  label:'صحة البيئة مكة',  dept:'makkah', email:'' },
+  { key:'env.aseer',  pass:'ase@2025',     role:'dept',  label:'صحة البيئة عسير', dept:'aseer',  email:'' },
+  { key:'env.tabuk',  pass:'tab@2025',     role:'dept',  label:'صحة البيئة تبوك', dept:'tabuk',  email:'' },
+];
+
+const SRC_N  = { field:'تقرير ميداني', meeting:'اجتماع دوري', complaint:'شكوى / بلاغ', other:'أخرى' };
+const S_LBL  = { pending:'لم تُعالَج', progress:'قيد المعالجة', done:'مكتملة' };
+const S_CLS  = { pending:'sp0', progress:'sp1', done:'sp2' };
+const P_CLS  = { high:'ph2', mid:'pm', low:'plo' };
+const P_LBL  = { high:'عالية', mid:'متوسطة', low:'منخفضة' };
+
+// ══ STATE ════════════════════════════════════════════════════
+let SB=null, CU=null, USERS=[], aFil='all', dFil='all', selDept='', openId=null;
+
+// ══ HELPERS ══════════════════════════════════════════════════
+const $  = id => document.getElementById(id);
+const $s = (id,v) => { const e=$(id); if(e) e.textContent=v; };
+const show = id => $(id).style.display='block';
+const hide = id => $(id).style.display='none';
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+function chOn(cid,el){ document.querySelectorAll('#'+cid+' .chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); }
+function loadUsers(){ try{ return JSON.parse(localStorage.getItem(USR_KEY)||'null')||DEFAULT_USERS; }catch(e){ return DEFAULT_USERS; } }
+function saveUsers(u){ localStorage.setItem(USR_KEY, JSON.stringify(u)); }
+function getDepts(){ return USERS.filter(u=>u.role==='dept'); }
+function getDeptName(key){ const u=USERS.find(u=>u.dept===key||u.key===key); return u?u.label:key; }
+
+// ══ INIT ═════════════════════════════════════════════════════
+$('n-dt').valueAsDate = new Date();
+['li-u','li-p'].forEach(id=>$(id).addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); }));
+
+window.onload = function(){
+  USERS = loadUsers();
+  const cfg = JSON.parse(localStorage.getItem(CFG_KEY)||'{}');
+  if(cfg.url && cfg.key) initSB(cfg.url, cfg.key);
+  loadEJSSettings();
+};
+
+// ══ SUPABASE ═════════════════════════════════════════════════
+function copySQL(){ navigator.clipboard.writeText($('sql-box').textContent); toast('تم نسخ الكود ✓'); }
+
+async function connectSB(){
+  const url=$('sup-url').value.trim(), key=$('sup-key').value.trim();
+  const err=$('setup-err');
+  if(!url||!key){ err.textContent='أدخل URL و Key'; return; }
+  err.textContent='جاري الاتصال...';
+  const ok = await initSB(url,key);
+  if(ok){ localStorage.setItem(CFG_KEY,JSON.stringify({url,key})); }
+  else { err.textContent='تعذّر الاتصال — تحقق من البيانات وتأكد من تشغيل الكود في SQL Editor'; }
+}
+
+async function initSB(url,key){
+  try{
+    SB = window.supabase.createClient(url,key);
+    const {error} = await SB.from('observations').select('id').limit(1);
+    if(error) throw error;
+    hide('setup'); show('login-screen'); return true;
+  }catch(e){ return false; }
+}
+
+function resetSB(){ if(!confirm('مسح بيانات الاتصال؟')) return; localStorage.removeItem(CFG_KEY); logout(); hide('login-screen'); show('setup'); }
+
+// ══ LOGIN ════════════════════════════════════════════════════
+function doLogin(){
+  USERS = loadUsers();
+  const u=$('li-u').value.trim().toLowerCase(), p=$('li-p').value;
+  if(!u||!p){ $('li-e').textContent='أدخل اسم المستخدم وكلمة المرور'; return; }
+  const usr = USERS.find(x=>x.key===u && x.pass===p);
+  if(!usr){ $('li-e').textContent='اسم المستخدم أو كلمة المرور غير صحيحة'; return; }
+  $('li-e').textContent='';
+  CU = usr;
+  hide('login-screen'); show('app');
+  $s('nav-u', CU.label);
+  $s('nav-sub', CU.role==='admin'?'لوحة المدير':'واجهة القسم');
+  if(CU.role==='admin'){ show('av'); buildDeptFilter(); renderAdmin(); renderDeptTab(); }
+  else { show('dv'); $s('d-title','ملاحظات '+CU.label); renderDept(); }
+  checkReminder();
+}
+
+function logout(){
+  CU=null; openId=null; aFil='all'; dFil='all';
+  hide('app'); hide('av'); hide('dv');
+  $('rem').style.display='none';
+  $('li-u').value=''; $('li-p').value='';
+  show('login-screen');
+}
+
+// ══ REMINDER ════════════════════════════════════════════════
+async function checkReminder(){
+  if(!SB) return;
+  const cutoff=new Date(Date.now()-15*24*60*60*1000).toISOString();
+  let q=SB.from('observations').select('id').neq('status','done').lt('added',cutoff);
+  if(CU.role==='dept') q=q.eq('dept',CU.dept);
+  const {data}=await q;
+  if(data&&data.length){ $('rem-txt').innerHTML=`<strong>تذكير:</strong> يوجد <strong>${data.length}</strong> ملاحظة تجاوزت 15 يوماً دون إغلاق.`; $('rem').style.display='flex'; }
+}
+
+// ══ DEPT VIEW ════════════════════════════════════════════════
+async function renderDept(){
+  $('d-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
+  const {data:all}=await SB.from('observations').select('*').eq('dept',CU.dept).order('added',{ascending:false});
+  if(!all) return;
+  const don=all.filter(o=>o.status==='done').length, prg=all.filter(o=>o.status==='progress').length;
+  const pnd=all.filter(o=>o.status==='pending').length, pct=all.length?Math.round(don/all.length*100):0;
+  $s('d-tot',all.length);$s('d-pnd',pnd);$s('d-prg',prg);$s('d-don',don);
+  $s('d-pct',pct+'%'); $('d-bar').style.width=pct+'%';
+  const f=dFil==='all'?all:all.filter(o=>o.status===dFil);
+  $('d-list').innerHTML=f.length?f.map(o=>card(o,false)).join(''):'<div class="empty"><div class="ei">✅</div>لا توجد ملاحظات بهذا الفلتر</div>';
+}
+function df(el,f){ dFil=f; openId=null; chOn('d-chips',el); renderDept(); }
+
+// ══ ADMIN OVERVIEW ═══════════════════════════════════════════
+async function renderAdmin(){
+  $('a-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
+  const {data:all}=await SB.from('observations').select('*').order('added',{ascending:false});
+  if(!all) return;
+  const don=all.filter(o=>o.status==='done').length, prg=all.filter(o=>o.status==='progress').length;
+  const pnd=all.filter(o=>o.status==='pending').length, pct=all.length?Math.round(don/all.length*100):0;
+  $s('a-tot',all.length);$s('a-pnd',pnd);$s('a-prg',prg);$s('a-don',don);
+  $s('a-pct',pct+'%'); $('a-bar').style.width=pct+'%';
+  const f=aFil;
+  let filt=all;
+  const depts=getDepts().map(d=>d.dept);
+  if(depts.includes(f)) filt=all.filter(o=>o.dept===f);
+  else if(['pending','progress','done'].includes(f)) filt=all.filter(o=>o.status===f);
+  $('a-list').innerHTML=filt.length?filt.map(o=>card(o,true)).join(''):'<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات</div>';
+}
+function af(el,f){ aFil=f; openId=null; chOn('a-chips',el); chOn('dept-filter-chips',el); renderAdmin(); }
+
+function buildDeptFilter(){
+  const c=$('dept-filter-chips'); c.innerHTML='';
+  getDepts().forEach(d=>{
+    const b=document.createElement('button');
+    b.className='chip'; b.textContent=d.label.replace('صحة البيئة ','');
+    b.onclick=()=>af(b,d.dept); c.appendChild(b);
+  });
+  // populate add form dept select
+  const sel=$('n-d'); sel.innerHTML='<option value="">— اختر —</option>';
+  getDepts().forEach(d=>{ const o=document.createElement('option'); o.value=d.dept; o.textContent=d.label; sel.appendChild(o); });
+}
+
+// ══ DEPT TAB ════════════════════════════════════════════════
+async function renderDeptTab(){
+  const {data:all}=await SB.from('observations').select('*');
+  if(!all) return;
+  const depts=getDepts();
+  if(!selDept && depts.length) selDept=depts[0].dept;
+  $('dept-grid').innerHTML=depts.map(d=>{
+    const obs=all.filter(o=>o.dept===d.dept);
+    const don=obs.filter(o=>o.status==='done').length, prg=obs.filter(o=>o.status==='progress').length;
+    const pnd=obs.filter(o=>o.status==='pending').length, pct=obs.length?Math.round(don/obs.length*100):0;
+    return `<div class="dc${d.dept===selDept?' sel':''}" onclick="selDD('${d.dept}')">
+      <div class="dn">${d.label}</div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--mut)">الإنجاز</span><span style="font-size:12px;font-weight:600;color:var(--navy)">${pct}%</span></div>
+      <div class="dbw"><div class="db" style="width:${pct}%"></div></div>
+      <div class="drow">
+        <div class="dm"><div class="dmv r">${pnd}</div><div class="dml">معلق</div></div>
+        <div class="dm"><div class="dmv a">${prg}</div><div class="dml">جارٍ</div></div>
+        <div class="dm"><div class="dmv g">${don}</div><div class="dml">منجز</div></div>
+        <div class="dm"><div class="dmv">${obs.length}</div><div class="dml">إجمالي</div></div>
+      </div></div>`;
+  }).join('');
+  if(selDept) selDD(selDept, all);
+}
+
+async function selDD(d, preloaded){
+  selDept=d; openId=null;
+  document.querySelectorAll('.dc').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.dc').forEach(c=>{ if(c.onclick&&c.onclick.toString().includes(`'${d}'`)) c.classList.add('sel'); });
+  $s('dt-title','ملاحظات '+getDeptName(d));
+  let obs;
+  if(preloaded) obs=preloaded.filter(o=>o.dept===d);
+  else { const {data}=await SB.from('observations').select('*').eq('dept',d).order('added',{ascending:false}); obs=data||[]; }
+  $('dt-list').innerHTML=obs.filter(o=>o.dept===d).length?obs.filter(o=>o.dept===d).map(o=>card(o,true)).join(''):'<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات لهذا القسم</div>';
+}
+
+// ══ ADD OBS ══════════════════════════════════════════════════
+async function addObs(){
+  const dept=$('n-d').value, short=$('n-sh').value.trim();
+  if(!dept||!short){ toast('يرجى تحديد القسم وعنوان الملاحظة'); return; }
+  const {error}=await SB.from('observations').insert({
+    dept, priority:$('n-p').value, source:$('n-s').value,
+    obs_date:$('n-dt').value||new Date().toISOString().split('T')[0],
+    short, full_text:$('n-fu').value.trim()||short, status:'pending', action:'', deadline:null
+  });
+  if(error){ toast('خطأ في الإضافة'); return; }
+  ['n-d','n-sh','n-fu'].forEach(id=>$(id).value='');
+  $('n-p').value='high'; $('n-s').value='field'; $('n-dt').valueAsDate=new Date();
+  toast('تمت إضافة الملاحظة ✓');
+  renderAdmin(); renderDeptTab();
+}
+
+// ══ CARD ════════════════════════════════════════════════════
+function card(o,isAdmin){
+  const isOpen=openId===o.id;
+  const tag=isAdmin?`<span class="dtag">${getDeptName(o.dept)}</span>`:'';
+  const src=SRC_N[o.source]||'';
+  return `<div class="oc" id="c${o.id}">
+    <div class="oh" onclick="tog(${o.id})">
+      <span class="on2">#${String(o.id).slice(-4)}</span>
+      <span class="op ${P_CLS[o.priority||'mid']}"></span>
+      <span class="os2">${o.short}</span>
+      <div class="om">${tag}<span class="od">${o.obs_date||''}</span>${src?`<span class="stag">${src}</span>`:''}<span class="spill ${S_CLS[o.status]}">${S_LBL[o.status]}</span><span class="ochv${isOpen?' open':''}">&#9654;</span></div>
+    </div>
+    ${isOpen?`<div class="ob open">
+      <div class="odt">${o.full_text||o.short}</div>
+      <div class="fgrid">
+        <div class="fg"><label>الحالة</label>
+          <select id="s${o.id}"><option value="pending"${o.status==='pending'?' selected':''}>لم تُعالَج</option><option value="progress"${o.status==='progress'?' selected':''}>قيد المعالجة</option><option value="done"${o.status==='done'?' selected':''}>مكتملة</option></select>
+        </div>
+        <div class="fg"><label>الموعد المتوقع للإنجاز</label><input type="date" id="dl${o.id}" value="${o.deadline||''}"></div>
+        <div class="fg ff"><label>الإجراء التصحيحي المتخذ</label><textarea id="ac${o.id}">${o.action||''}</textarea></div>
+      </div>
+      <div class="fa">
+        ${isAdmin?`<button class="bdel" onclick="delObs(${o.id},event)">حذف</button>`:'<span></span>'}
+        <button class="bsv" onclick="saveCard(${o.id})">حفظ التحديث</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+
+function tog(id){ openId=openId===id?null:id; rerender(); }
+
+async function saveCard(id){
+  const {error}=await SB.from('observations').update({
+    status:$('s'+id).value, action:$('ac'+id).value, deadline:$('dl'+id).value||null
+  }).eq('id',id);
+  if(error){ toast('خطأ في الحفظ'); return; }
+  toast('تم حفظ التحديث ✓'); rerender();
+}
+
+async function delObs(id,e){
+  e.stopPropagation();
+  if(!confirm('حذف هذه الملاحظة نهائياً؟')) return;
+  await SB.from('observations').delete().eq('id',id);
+  if(openId===id) openId=null;
+  toast('تم الحذف'); rerender();
+}
+
+function rerender(){
+  if(!CU) return;
+  if(CU.role==='admin'){ renderAdmin(); renderDeptTab(); } else renderDept();
+}
+
+// ══ EXCEL ════════════════════════════════════════════════════
+async function exportXL(all){
+  let q=SB.from('observations').select('*').order('added',{ascending:false});
+  if(!all) q=q.eq('dept',CU.dept);
+  const {data}=await q;
+  if(!data||!data.length){ toast('لا توجد بيانات للتصدير'); return; }
+  const rows=data.map(o=>({
+    'الرقم':o.id, 'القسم':getDeptName(o.dept), 'عنوان الملاحظة':o.short,
+    'تفاصيل الملاحظة':o.full_text||'', 'المصدر':SRC_N[o.source]||'',
+    'الأولوية':P_LBL[o.priority]||'', 'الحالة':S_LBL[o.status]||'',
+    'تاريخ الملاحظة':o.obs_date||'', 'تاريخ الإضافة':o.added?o.added.split('T')[0]:'',
+    'الإجراء المتخذ':o.action||'', 'الموعد المتوقع':o.deadline||'',
+  }));
+  const ws=XLSX.utils.json_to_sheet(rows);
+  ws['!cols']=[{wch:10},{wch:22},{wch:36},{wch:46},{wch:16},{wch:10},{wch:14},{wch:14},{wch:14},{wch:42},{wch:14}];
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'الخطة التصحيحية');
+  XLSX.writeFile(wb,`خطة_تصحيحية_${new Date().toISOString().split('T')[0]}.xlsx`);
+  toast('تم تصدير Excel ✓');
+}
+
+// ══ SETTINGS ════════════════════════════════════════════════
+function renderSettings(){
+  USERS=loadUsers();
+  $('user-rows').innerHTML=USERS.map((u,i)=>`
+    <div class="urow" id="ur${i}">
+      <span class="ulbl">${u.label}</span>
+      <input class="ui" data-i="${i}" data-f="key"   value="${u.key}"   placeholder="اسم الدخول" dir="ltr">
+      <input class="ui" data-i="${i}" data-f="pass"  value="${u.pass}"  placeholder="كلمة المرور" dir="ltr">
+      <input class="ui" data-i="${i}" data-f="email" value="${u.email||''}" placeholder="email@company.com" dir="ltr" type="email">
+      ${u.role==='admin'?'<span></span>':`<button class="bdel2" onclick="delUserRow(${i})">×</button>`}
+    </div>`).join('');
+}
+
+function addUserRow(){
+  const newUser={ key:'', pass:'', role:'dept', label:'قسم جديد', dept:'dept_'+Date.now(), email:'' };
+  USERS.push(newUser);
+  renderSettings();
+  // scroll to new row
+  $('user-rows').lastElementChild?.scrollIntoView({behavior:'smooth'});
+}
+
+function delUserRow(i){
+  if(!confirm('حذف هذا المستخدم؟')) return;
+  USERS.splice(i,1); renderSettings();
+}
+
+function saveSettings(){
+  const inputs=$('user-rows').querySelectorAll('input[data-i]');
+  inputs.forEach(inp=>{
+    const i=parseInt(inp.dataset.i), f=inp.dataset.f;
+    if(USERS[i]) USERS[i][f]=inp.value.trim();
+  });
+  // update label for new depts
+  USERS.forEach(u=>{ if(u.role==='dept'&&!u.label.includes('صحة')) u.label=u.label||'قسم'; });
+  saveUsers(USERS);
+  toast('تم حفظ جميع التغييرات ✓');
+  buildDeptFilter();
+  renderEmailDeptList();
+}
+
+// ══ EMAILJS ══════════════════════════════════════════════════
+function loadEJSSettings(){
+  const s=JSON.parse(localStorage.getItem(EJS_KEY)||'{}');
+  if($('ejs-sid')) $('ejs-sid').value=s.sid||'';
+  if($('ejs-tid')) $('ejs-tid').value=s.tid||'';
+  if($('ejs-key')) $('ejs-key').value=s.key||'';
+  if($('ejs-name')) $('ejs-name').value=s.name||'إدارة التفتيش';
+  if(s.key) emailjs.init(s.key);
+}
+
+function saveEJS(){
+  const s={ sid:$('ejs-sid').value.trim(), tid:$('ejs-tid').value.trim(), key:$('ejs-key').value.trim(), name:$('ejs-name').value.trim() };
+  if(!s.sid||!s.tid||!s.key){ toast('يرجى إدخال جميع بيانات EmailJS'); return; }
+  localStorage.setItem(EJS_KEY,JSON.stringify(s));
+  emailjs.init(s.key);
+  toast('تم حفظ إعدادات الإيميل ✓');
+}
+
+async function renderEmailDeptList(){
+  const el=$('email-dept-list'); if(!el) return;
+  const depts=getDepts();
+  if(!SB){ el.innerHTML='<p style="font-size:13px;color:var(--mut)">يرجى الاتصال بقاعدة البيانات أولاً</p>'; return; }
+  const {data:all}=await SB.from('observations').select('dept,status');
+  el.innerHTML=depts.map(d=>{
+    const pnd=(all||[]).filter(o=>o.dept===d.dept&&o.status==='pending').length;
+    const hasEmail=!!d.email;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bdr);">
+      <span style="flex:1;font-size:13px;font-weight:500;color:var(--txt)">${d.label}</span>
+      <span style="font-size:12px;color:var(--mut)">${d.email||'لا يوجد إيميل'}</span>
+      <span class="spill ${pnd>0?'sp0':'sp2'}">${pnd} معلق</span>
+      <button class="bsend" style="padding:5px 12px;font-size:12px;" onclick="sendReminder('${d.dept}','${d.label}','${d.email}',${pnd})" ${!hasEmail||pnd===0?'disabled':''}>إرسال</button>
+    </div>`;
+  }).join('');
+}
+
+async function sendReminder(dept,label,email,pndCount){
+  if(!email){ toast('لا يوجد إيميل لهذا القسم — أضفه في الإعدادات'); return; }
+  const s=JSON.parse(localStorage.getItem(EJS_KEY)||'{}');
+  if(!s.sid||!s.tid){ toast('يرجى إعداد EmailJS أولاً'); return; }
+  try{
+    await emailjs.send(s.sid, s.tid, {
+      to_email: email, dept_name: label,
+      pending_count: pndCount, from_name: s.name||'إدارة التفتيش'
+    });
+    toast(`تم إرسال التذكير إلى ${label} ✓`);
+  }catch(e){ toast('خطأ في الإرسال: '+e.text); }
+}
+
+async function sendAllReminders(){
+  const s=JSON.parse(localStorage.getItem(EJS_KEY)||'{}');
+  if(!s.sid||!s.tid){ toast('يرجى إعداد EmailJS أولاً'); return; }
+  const depts=getDepts().filter(d=>d.email);
+  if(!depts.length){ toast('لا يوجد إيميل مُضاف لأي قسم — أضفه في الإعدادات'); return; }
+  const {data:all}=await SB.from('observations').select('dept,status');
+  let sent=0;
+  for(const d of depts){
+    const pnd=(all||[]).filter(o=>o.dept===d.dept&&o.status==='pending').length;
+    if(pnd>0){
+      try{
+        await emailjs.send(s.sid,s.tid,{ to_email:d.email, dept_name:d.label, pending_count:pnd, from_name:s.name||'إدارة التفتيش' });
+        sent++;
+      }catch(e){}
+    }
+  }
+  toast(sent>0?`تم إرسال ${sent} تذكير ✓`:'لا توجد ملاحظات معلقة للإرسال');
+}
+
+// ══ TABS ════════════════════════════════════════════════════
+function stab(name,btn){
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  ['ov','ad','dt','st','em'].forEach(n=>$('tp-'+n).classList.remove('show'));
+  $('tp-'+name).classList.add('show');
+  if(name==='st'){ renderSettings(); }
+  if(name==='em'){ loadEJSSettings(); renderEmailDeptList(); }
+}
+</script>
+</body>
+</html>
