@@ -110,6 +110,8 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
   flex-wrap:nowrap;
   overflow-x:auto;
   padding-bottom:4px;
+  background:transparent;
+  border: none;
 }
 
 #dept-filter-chips .chip{
@@ -396,12 +398,7 @@ create policy "open_access" on observations
             <button class="bxl" onclick="exportXL(true)">⬇️ Excel</button>
           </div>
         </div>
-        <div class="filter-card">
-            <div class="chips" id="dept-filter-chips"></div>
-          </div>
-        
-        </div>
-        <div class="olist" id="a-list"></div>
+        <div class="chips" id="dept-filter-chips"></div>
       </div>
 
       <!-- ADD -->
