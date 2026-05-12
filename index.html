@@ -631,9 +631,9 @@ async function buildDeptFilter(){
 // ══ DEPT TAB ════════════════════════════════════════════════
 async function renderDeptTab(){
   const { data: depts, error: deptErr } = await SB
-    .from('user_profiles')
-    .select('dept,label,role')
-    .eq('role','dept');
+    .from('departments')
+    .select('dept,label')
+    .order('label', { ascending: true });
 
   console.log('DEPTS:', depts, 'DEPT ERROR:', deptErr);
 
