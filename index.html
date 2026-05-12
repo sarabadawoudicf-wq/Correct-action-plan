@@ -262,6 +262,25 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
   .wrap{padding:14px;}.nav{padding:0 14px;}.lc{padding:30px 18px;}
 }
 
+.dept-filter-clean{
+  width:100%;
+  margin:12px 0 18px;
+  padding:0;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  display:flex;
+  gap:8px;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+}
+
+.dept-filter-clean .chip{
+  white-space:nowrap;
+  flex:0 0 auto;
+}
+
+  
 .timeline{margin-top:8px;display:flex;flex-direction:column;gap:10px;}
 .titem{background:var(--surf);border:1px solid var(--bdr);border-right:4px solid var(--navy);border-radius:10px;padding:10px 12px;}
 .tmeta{font-size:11px;color:var(--mut);margin-bottom:6px;}
@@ -398,7 +417,8 @@ create policy "open_access" on observations
             <button class="bxl" onclick="exportXL(true)">⬇️ Excel</button>
           </div>
         </div>
-        <div class="chips" id="dept-filter-chips"></div>
+        <div class="chips dept-filter-clean" id="dept-filter-chips"></div>
+        <div class="olist" id="a-list"></div>
       </div>
 
       <!-- ADD -->
