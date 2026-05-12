@@ -892,7 +892,7 @@ async function loadActions(id){
 
 function card(o,isAdmin){
   const isOpen=openId===o.id;
-  const tag=isAdmin?<span class="dtag">${getDeptName(o.dept)}</span>:'';
+  const tag=isAdmin? `<span class="dtag">${getDeptName(o.dept)}</span>`:'';
   const src=SRC_N[o.source] || '';
 
   return `<div class="oc" id="c${o.id}">
