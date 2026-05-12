@@ -1062,7 +1062,7 @@ async function exportXL(all){
   const wb=XLSX.utils.book_new();
 
   XLSX.utils.book_append_sheet(wb,ws,'الخطة التصحيحية');
-  XLSX.writeFile(wb,خطة_تصحيحية_${new Date().toISOString().split('T')[0]}.xlsx);
+  XLSX.writeFile(wb,`خطة_تصحيحية_${new Date().toISOString().split('T')[0]}.xlsx`);
 
   toast('تم تصدير Excel ✓');
 }
