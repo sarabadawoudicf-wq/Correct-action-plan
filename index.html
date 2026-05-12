@@ -572,6 +572,11 @@ async function restoreSession(){
 }
 
 async function openAppByRole(){
+  aFil = 'all';
+  dFil = 'all';
+  selDept = '';
+  openId = null;
+ 
   hide('login-screen');
   show('app');
 
@@ -658,6 +663,7 @@ async function logout(){
   openId=null;
   aFil='all';
   dFil='all';
+  selDept='';
 
   hide('app');
   hide('av');
