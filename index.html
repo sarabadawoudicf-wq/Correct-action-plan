@@ -441,10 +441,23 @@ create policy "open_access" on observations
 
       <!-- DEPT DETAIL -->
 <div class="tp" id="tp-dt">
+
+  <div class="acard" style="max-width:420px;margin-bottom:18px;">
+    <label style="font-size:13px;color:var(--mut);font-weight:600;">اختر القسم</label>
+    <select id="dt-select" onchange="selDD(this.value)" style="margin-top:8px;width:100%;padding:10px;border:1px solid var(--bdr);border-radius:10px;font-family:inherit;">
+    </select>
+  </div>
+
   <div class="dgrid" id="dept-grid"></div>
-  <div class="sh"><span class="st" id="dt-title">—</span></div>
+
+  <div class="sh">
+    <span class="st" id="dt-title">—</span>
+  </div>
+
   <div class="olist" id="dt-list"></div>
+
 </div>
+
       
  </div>
 </div>
@@ -820,7 +833,11 @@ async function renderDeptTab(){
 
   if(!selDept) selDept=depts[0].dept;
 
-  $('dept-grid').innerHTML=depts.map(d=>{
+  $('dt-select').innerHTML = depts.map(d =>
+  `<option value="${d.dept}" ${d.dept===selDept?'selected':''}>${d.label}</option>`
+).join('');
+
+  $('dept-grid').innerHTML=depts.filter(d=>d.dept===selDept).map(d=>{
     const obs=(all||[]).filter(o=>o.dept===d.dept);
     const don=obs.filter(o=>o.status==='done').length;
     const prg=obs.filter(o=>o.status==='progress').length;
