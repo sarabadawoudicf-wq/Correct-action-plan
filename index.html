@@ -599,7 +599,7 @@ async function buildDeptFilter(){
   const { data, error } = await SB
     .from('departments')
     .select('*')
-    .order('label', { ascending: true })
+    .order('label', { ascending: true });
 
   if(error || !data){
     console.log('DEPARTMENTS ERROR:', error);
@@ -627,17 +627,6 @@ async function buildDeptFilter(){
 }
   
 
-  // تعبئة القائمة (ADD)
-  const sel = $('n-d');
-  sel.innerHTML = '<option value="">— اختر —</option>';
-
-  data.forEach(d=>{
-    const o = document.createElement('option');
-    o.value = d.dept;
-    o.textContent = d.label;
-    sel.appendChild(o);
-  });
-}
 
 // ══ DEPT TAB ════════════════════════════════════════════════
 async function renderDeptTab(){
