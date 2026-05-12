@@ -903,7 +903,7 @@ function card(o,isAdmin){
       <div class="om">
         ${tag}
         <span class="od">${o.obs_date || ''}</span>
-        ${src?<span class="stag">${src}</span>:''}
+        ${src? `<span class="stag">${src}</span>` :''}
         <span class="spill ${S_CLS[o.status]}">${S_LBL[o.status]}</span>
         <span class="ochv${isOpen?' open':''}">&#9654;</span>
       </div>
