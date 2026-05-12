@@ -86,7 +86,39 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .pf{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--grn),#2ecc71);transition:width .5s;}
 
 /* ── CHIPS ───────────────────────────────────────────────── */
-.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.sh{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.filter-card{
+  background:#fff;
+  border:1px solid var(--bdr);
+  border-radius:14px;
+  padding:12px;
+  margin:12px 0 18px;
+  box-shadow:var(--sh);
+}
+
+#dept-filter-chips{
+  display:flex;
+  gap:8px;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  padding-bottom:4px;
+}
+
+#dept-filter-chips .chip{
+  white-space:nowrap;
+  flex:0 0 auto;
+}
+
+
+  
 .st{font-size:15px;font-weight:600;color:var(--navy);}
   
 .chips{
@@ -361,9 +393,13 @@ create policy "open_access" on observations
               <button class="chip a" onclick="af(this,'progress')">قيد المعالجة</button>
               <button class="chip g" onclick="af(this,'done')">مكتملة</button>
             </div>
-            <div class="chips" id="dept-filter-chips"></div>
             <button class="bxl" onclick="exportXL(true)">⬇️ Excel</button>
           </div>
+        </div>
+        <div class="filter-card">
+            <div class="chips" id="dept-filter-chips"></div>
+          </div>
+        
         </div>
         <div class="olist" id="a-list"></div>
       </div>
