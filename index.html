@@ -1007,14 +1007,15 @@ async function sendAllReminders(){
 // ══ TABS ════════════════════════════════════════════════════
 function stab(name,btn){
   document.querySelectorAll('.atab').forEach(t=>t.classList.remove('on'));
-
   btn.classList.add('on');
 
   ['ov','ad','dt'].forEach(n=>{
-    $('tp-'+n).classList.remove('show');
+    const tab = $('tp-'+n);
+    if(tab) tab.classList.remove('show');
   });
 
-  $('tp-'+name).classList.add('show');
+  const activeTab = $('tp-'+name);
+  if(activeTab) activeTab.classList.add('show');
 }
 </script>
 </body>
