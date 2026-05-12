@@ -594,24 +594,38 @@ function af(el,f){ aFil=f; openId=null; chOn('a-chips',el); chOn('dept-filter-ch
 //new-000
 async function buildDeptFilter(){
   const c = $('dept-filter-chips');
-  c.innerHTML = '';
+  if(c) c.innerHTML = '';
 
   const { data, error } = await SB
-    .from('department')
-    .select('*');
+    .from('departments')
+    .select('*')
     .order('label', { ascending: true });
-    
 
-  if(error || !data) return;
+  if(error || !data){
+    console.log('DEPARTMENTS ERROR:', error);
+    return;
+  }
 
-  // الفلاتر
   data.forEach(d=>{
+    if(!c) return;
     const b = document.createElement('button');
     b.className = 'chip';
     b.textContent = d.label;
     b.onclick = ()=>af(b, d.dept);
     c.appendChild(b);
   });
+
+  const sel = $('n-d');
+  sel.innerHTML = '<option value="">— اختر —</option>';
+
+  data.forEach(d=>{
+    const o = document.createElement('option');
+    o.value = d.dept;
+    o.textContent = d.label;
+    sel.appendChild(o);
+  });
+}
+  
 
   // تعبئة القائمة (ADD)
   const sel = $('n-d');
