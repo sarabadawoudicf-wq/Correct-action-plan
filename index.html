@@ -940,7 +940,7 @@ function card(o,isAdmin){
       </div>
 
       <div class="fa">
-        ${CU && CU.role==='admin' ? <button class="bdel" onclick="delObs(${o.id},event)">حذف</button> : '<span></span>'}
+        ${CU.role === 'admin' ? `<button class="bdel" onclick="delObs(${o.id},event)">حذف</button>` : `<span></span>`}
         <button class="bsv" onclick="saveCard(${o.id})">حفظ التحديث</button>
       </div>
     </div>` : ''}
