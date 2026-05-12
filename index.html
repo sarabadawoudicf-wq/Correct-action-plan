@@ -370,60 +370,7 @@ create policy "open_access" on observations
         <div class="olist" id="dt-list"></div>
       </div>
 
-      <!-- SETTINGS -->
-      <div class="tp" id="tp-st">
-        <div class="scard">
-          <h3>إدارة المستخدمين والأقسام</h3>
-          <p>إضافة أقسام جديدة أو تعديل بيانات الدخول وإيميل التذكير لكل مستخدم.</p>
-          <div class="uhdr">
-            <span class="uh">المستخدم</span>
-            <span class="uh">اسم الدخول</span>
-            <span class="uh">كلمة المرور</span>
-            <span class="uh">إيميل التذكير</span>
-            <span></span>
-          </div>
-          <div id="user-rows"></div>
-          <button class="badd2" onclick="addUserRow()">+ إضافة قسم جديد</button>
-          <div style="margin-top:14px;"><button class="bset" onclick="saveSettings()">حفظ جميع التغييرات</button></div>
-          <div class="snote">⚠️ بعد حفظ بيانات مستخدم جديد، أرسل له الرابط واسم الدخول وكلمة المرور.</div>
-        </div>
-        <div class="scard">
-          <h3>إعادة ضبط الاتصال</h3>
-          <p>إذا أردت تغيير مشروع Supabase.</p>
-          <button style="padding:8px 18px;background:var(--red);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13px;cursor:pointer;" onclick="resetSB()">إعادة الضبط</button>
-        </div>
-      </div>
-
-      <!-- EMAIL -->
-      <div class="tp" id="tp-em">
-        <div class="scard">
-          <h3>إعداد إرسال التذكير بالإيميل</h3>
-          <p>استخدم <strong>EmailJS</strong> (مجاني، 200 إيميل/شهر). أنشئ حساباً على emailjs.com، أنشئ خدمة بريد وقالب، ثم أدخل البيانات هنا.</p>
-          <div class="ejs-fields">
-            <div class="fg2"><label>Service ID</label><input type="text" id="ejs-sid" placeholder="service_xxxxxxx" dir="ltr"></div>
-            <div class="fg2"><label>Template ID</label><input type="text" id="ejs-tid" placeholder="template_xxxxxxx" dir="ltr"></div>
-            <div class="fg2"><label>Public Key</label><input type="text" id="ejs-key" placeholder="xxxxxxxxxxxxxxxxxxxxxx" dir="ltr"></div>
-            <div class="fg2"><label>اسم المرسل (يظهر في الإيميل)</label><input type="text" id="ejs-name" placeholder="إدارة التفتيش" class="rtl"></div>
-          </div>
-          <button class="bset" onclick="saveEJS()">حفظ إعدادات الإيميل</button>
-          <div style="margin-top:18px;border-top:1px solid var(--bdr);padding-top:16px;">
-            <p style="font-size:13px;font-weight:500;color:var(--navy);margin-bottom:10px;">إرسال التذكير</p>
-            <div id="email-dept-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
-            <button class="bsend" id="send-all-btn" onclick="sendAllReminders()">إرسال تذكير لجميع الأقسام التي لديها ملاحظات معلقة</button>
-          </div>
-          <div class="ejs-note">
-            <strong>كيف تضبط القالب في EmailJS:</strong><br>
-            عند إنشاء Template استخدم هذه المتغيرات:<br>
-            <code style="font-family:monospace;font-size:11px;">{{to_email}}</code> — إيميل القسم &nbsp;|&nbsp;
-            <code style="font-family:monospace;font-size:11px;">{{dept_name}}</code> — اسم القسم &nbsp;|&nbsp;
-            <code style="font-family:monospace;font-size:11px;">{{pending_count}}</code> — عدد الملاحظات المعلقة &nbsp;|&nbsp;
-            <code style="font-family:monospace;font-size:11px;">{{from_name}}</code> — اسم المرسل
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+    
 <div class="toast" id="toast"></div>
 
 <script>
