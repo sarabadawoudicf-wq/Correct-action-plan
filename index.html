@@ -419,14 +419,6 @@ $('n-dt').valueAsDate = new Date();
   });
 });
 
-$('n-dt').valueAsDate = new Date();
-
-['li-u','li-p'].forEach(id=>{
-  $(id).addEventListener('keydown', e=>{
-    if(e.key === 'Enter') doLogin();
-  });
-});
-
 window.onload = async function(){
 
   USERS = [];
@@ -1024,7 +1016,7 @@ async function delObs(id,e){
 async function rerender(){
   if(!CU) return;
 
-  if(CU.role === 'admin'){
+  if(CU.role === 'admin' || CU.role === 'limited_admin'){
     await renderAdmin();
     await renderDeptTab();
   } else {
