@@ -360,7 +360,14 @@ create policy "open_access" on observations
           <div class="fg2" style="margin-top:10px;"><label>تفاصيل الملاحظة</label><textarea id="n-fu" rows="4" placeholder="النص الكامل للملاحظة..."></textarea></div>
           <div style="margin-top:14px;"><button class="badd" onclick="addObs()">إضافة الملاحظة</button></div>
         </div>
-      </div>
+       <div style="margin-top:30px;">
+        <div class="sh">
+         <span class="st">الملاحظات التي أضفتها</span>
+       </div>
+
+       <div class="olist" id="my-added-list"></div>
+       </div>
+    </div>
 
       <!-- DEPT DETAIL -->
 <div class="tp" id="tp-dt">
@@ -478,6 +485,7 @@ if(error){
   $('li-e').textContent = '';
 
   CU = {
+    id: userId,
     key: email,
     role: profile.role,
     label: profile.label,
@@ -496,6 +504,23 @@ if(CU.role === 'admin'){
   await buildDeptFilter();
   await renderAdmin();
   await renderDeptTab();
+
+} else if(CU.role === 'limited_admin'){
+  show('av');
+  await buildDeptFilter();
+  await renderMyAdded();
+
+  document.querySelectorAll('.atab').forEach(t=>t.style.display='none');
+  document.querySelectorAll('.tp').forEach(t=>t.classList.remove('show'));
+
+  const addTab = document.querySelector("button[onclick=\"stab('ad',this)\"]");
+  if(addTab){
+    addTab.style.display='inline-block';
+    addTab.classList.add('on');
+  }
+
+  $('tp-ad').classList.add('show');
+
 } else {
   show('dv');
   $s('d-title', 'ملاحظات ' + CU.label);
@@ -572,9 +597,9 @@ async function buildDeptFilter(){
   c.innerHTML = '';
 
   const { data, error } = await SB
-    .from('user_profiles')
-    .select('*')
-    .eq('role', 'dept');
+    .from('department')
+    .select('*');
+    
 
   if(error || !data) return;
 
@@ -716,7 +741,7 @@ async function addObs(){
   const {error}=await SB.from('observations').insert({
     dept, priority:$('n-p').value, source:$('n-s').value,
     obs_date:$('n-dt').value||new Date().toISOString().split('T')[0],
-    short, full_text:$('n-fu').value.trim()||short, status:'pending', action:'', deadline:null
+    short, full_text:$('n-fu').value.trim()||short, status:'pending', action:'', deadline:null, created_by: CU.id
   });
   if(error){ toast('خطأ في الإضافة'); return; }
   ['n-d','n-sh','n-fu'].forEach(id=>$(id).value='');
@@ -1005,6 +1030,31 @@ async function sendAllReminders(){
 }
 
 // ══ TABS ════════════════════════════════════════════════════
+async function renderMyAdded(){
+
+  if(CU.role !== 'limited_admin') return;
+
+  const box = $('my-added-list');
+
+  box.innerHTML = '<div class="loading-row">جاري التحميل...</div>';
+
+  const { data, error } = await SB
+    .from('observations')
+    .select('*')
+    .eq('created_by', CU.id)
+    .order('added', { ascending:false });
+
+  if(error){
+    box.innerHTML = '<div class="empty">خطأ في التحميل</div>';
+    return;
+  }
+
+  box.innerHTML = data && data.length
+    ? data.map(o=>card(o,false)).join('')
+    : '<div class="empty">لم تقم بإضافة أي ملاحظات بعد</div>';
+}
+
+  
 function stab(name,btn){
   document.querySelectorAll('.atab').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
