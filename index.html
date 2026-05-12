@@ -444,7 +444,7 @@ create policy "open_access" on observations
 
   <div class="acard" style="max-width:420px;margin-bottom:18px;">
     <label style="font-size:13px;color:var(--mut);font-weight:600;">اختر القسم</label>
-    <select id="dt-select" onchange="selDD(this.value)" style="margin-top:8px;width:100%;padding:10px;border:1px solid var(--bdr);border-radius:10px;font-family:inherit;">
+    <select id="dt-select" onchange="changeDeptDetail(this.value)" style="margin-top:8px;width:100%;padding:10px;border:1px solid var(--bdr);border-radius:10px;font-family:inherit;">
     </select>
   </div>
 
@@ -686,6 +686,9 @@ async function checkReminder(){
   }
 }
 
+
+
+  
 async function renderDept(){
   $('d-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
 
@@ -800,6 +803,12 @@ async function buildDeptFilter(){
   });
 }
 
+async function changeDeptDetail(value){
+  selDept = value;
+  openId = null;
+  await renderDeptTab();
+}
+  
 async function renderDeptTab(){
   const {data:depts,error:deptErr}=await SB
     .from('departments')
