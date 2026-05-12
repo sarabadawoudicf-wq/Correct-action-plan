@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نظام متابعة الخطة التصحيحية</title>
+<title>نظام متابعة الخطة التصحيحية </title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -21,8 +21,22 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;direction:rtl}
 
+/* ── SETUP ───────────────────────────────────────────────── */
+#setup{position:fixed;inset:0;background:rgba(10,15,35,.9);z-index:1000;display:none !important;align-items:center;justify-content:center;overflow-y:auto;padding:20px;}
+.setup-box{background:var(--w);border-radius:18px;padding:36px;width:520px;max-width:95vw;}
+.setup-box h2{font-size:17px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+.setup-box p{font-size:13px;color:var(--mut);margin-bottom:20px;line-height:1.6;}
+.sf{margin-bottom:14px;}
+.sf label{display:block;font-size:12px;color:var(--mut);margin-bottom:5px;font-weight:500;}
+.sf input{width:100%;padding:10px 12px;border:1px solid var(--bdr);border-radius:9px;font-family:inherit;font-size:13px;color:var(--txt);background:var(--surf);direction:ltr;text-align:left;outline:none;transition:border-color .2s;}
+.sf input:focus{border-color:var(--navy3);}
+.sql{background:#f0f4ff;border:1px solid #c5d0f0;border-radius:9px;padding:12px;font-family:monospace;font-size:11px;color:#2a3a6e;direction:ltr;text-align:left;line-height:1.7;margin-bottom:12px;white-space:pre-wrap;word-break:break-all;max-height:160px;overflow-y:auto;}
+.bcopy{background:var(--navy);color:#fff;border:none;padding:6px 14px;border-radius:7px;font-family:inherit;font-size:12px;cursor:pointer;margin-bottom:14px;}
+.bconn{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;}
+.setup-err{font-size:12px;color:var(--red);margin-top:8px;min-height:16px;}
+
 /* ── LOGIN ───────────────────────────────────────────────── */
-#login-screen{min-height:100vh;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 60%,#243668,#1b2b52 60%,#111e3a);position:relative;overflow:hidden;}
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 60%,#243668,#1b2b52 60%,#111e3a);position:relative;overflow:hidden;}
 .lr{position:absolute;border-radius:50%;border:1px solid rgba(200,150,42,.11);pointer-events:none;}
 .lr1{width:700px;height:700px;top:-300px;right:-200px;}
 .lr2{width:450px;height:450px;bottom:-150px;left:-150px;}
@@ -37,12 +51,6 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .lb{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;}
 .lb:hover{opacity:.9;}
 .le{font-size:12.5px;color:#ff8585;margin-top:10px;text-align:center;min-height:16px;}
-
-/* ── LOADING SCREEN ──────────────────────────────────────── */
-#loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 60%,#243668,#1b2b52 60%,#111e3a);}
-.loading-spinner{text-align:center;color:rgba(255,255,255,.7);font-size:14px;}
-.spinner{width:40px;height:40px;border:3px solid rgba(200,150,42,.3);border-top-color:var(--gold2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;}
-@keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── NAV ─────────────────────────────────────────────────── */
 #app{display:none;}
@@ -156,6 +164,32 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .dmv.r{color:var(--red);}.dmv.a{color:var(--amb);}.dmv.g{color:var(--grn);}
 .dml{font-size:10px;color:var(--mut);}
 
+/* ── SETTINGS ─────────────────────────────────────────────── */
+.scard{background:var(--w);border:1px solid var(--bdr);border-radius:14px;padding:24px;box-shadow:var(--sh);max-width:680px;margin-bottom:20px;}
+.scard h3{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:4px;}
+.scard p{font-size:13px;color:var(--mut);margin-bottom:16px;line-height:1.6;}
+.urow{display:grid;grid-template-columns:130px 1fr 1fr 1fr 36px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bdr);}
+.urow:last-of-type{border-bottom:none;}
+.uhdr{display:grid;grid-template-columns:130px 1fr 1fr 1fr 36px;gap:8px;padding-bottom:7px;border-bottom:1px solid var(--bdr);margin-bottom:2px;}
+.uh{font-size:11px;color:var(--mut);font-weight:500;}
+.ulbl{font-size:13px;font-weight:500;color:var(--txt);}
+.ui{padding:7px 9px;border:1px solid var(--bdr);border-radius:7px;font-family:inherit;font-size:12px;color:var(--txt);background:var(--surf);direction:ltr;text-align:left;outline:none;width:100%;}
+.ui:focus{border-color:var(--navy3);}
+.ui.rtl{direction:rtl;text-align:right;}
+.bdel2{background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:2px 4px;border-radius:6px;line-height:1;transition:background .14s;}
+.bdel2:hover{background:var(--rbg);}
+.badd2{padding:8px 18px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;font-family:inherit;font-size:12.5px;color:var(--txt);cursor:pointer;transition:background .14s;margin-top:12px;}
+.badd2:hover{background:var(--bg);}
+.bset{padding:9px 22px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;margin-top:14px;}
+.snote{font-size:12px;color:#6a4800;margin-top:10px;line-height:1.6;background:var(--abg);border-radius:8px;padding:10px 13px;}
+
+/* EmailJS settings */
+.ejs-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.bsend{padding:8px 18px;background:var(--grn);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:background .14s;}
+.bsend:hover{opacity:.88;}
+.bsend:disabled{opacity:.5;cursor:not-allowed;}
+.ejs-note{font-size:12px;color:var(--mut);margin-top:10px;line-height:1.6;}
+
 /* EMPTY / TOAST */
 .empty{text-align:center;padding:42px 20px;color:var(--mut);font-size:13.5px;}
 .ei{font-size:36px;margin-bottom:10px;}
@@ -164,7 +198,9 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 
 @media(max-width:600px){
   .stats{grid-template-columns:repeat(2,1fr);}
-  .fgrid,.frow{grid-template-columns:1fr;}
+  .fgrid,.frow,.ejs-fields{grid-template-columns:1fr;}
+  .urow,.uhdr{grid-template-columns:1fr 1fr 1fr 36px;}
+  .urow .ulbl{display:none;}
   .wrap{padding:14px;}.nav{padding:0 14px;}.lc{padding:30px 18px;}
 }
 
@@ -172,15 +208,39 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .titem{background:var(--surf);border:1px solid var(--bdr);border-right:4px solid var(--navy);border-radius:10px;padding:10px 12px;}
 .tmeta{font-size:11px;color:var(--mut);margin-bottom:6px;}
 .ttext{font-size:13px;color:var(--txt);line-height:1.7;white-space:pre-wrap;}
+  
 </style>
 </head>
 <body>
 
-<!-- ══ LOADING SCREEN ════════════════════════════════════════ -->
-<div id="loading-screen">
-  <div class="loading-spinner">
-    <div class="spinner"></div>
-    جاري التحقق من الجلسة...
+<!-- ══ SETUP OVERLAY ════════════════════════════════════════ -->
+<div id="setup" style="display:none;">
+  <div class="setup-box">
+    <h2>🔧 إعداد قاعدة البيانات — مرة واحدة فقط</h2>
+    <p>أنشئ مشروعاً مجانياً على <strong>supabase.com</strong> ثم شغّل هذا الكود في SQL Editor، وأدخل بيانات الاتصال.</p>
+    <p style="font-size:12px;color:var(--mut);margin-bottom:8px;font-weight:500;">① الصق هذا الكود في Supabase → SQL Editor → Run</p>
+    <div class="sql" id="sql-box">create table if not exists observations (
+  id bigserial primary key,
+  dept text not null,
+  priority text default 'mid',
+  source text default 'field',
+  obs_date date,
+  added timestamptz default now(),
+  short text not null,
+  full_text text default '',
+  status text default 'pending',
+  action text default '',
+  deadline date
+);
+alter table observations enable row level security;
+create policy "open_access" on observations
+  for all using (true) with check (true);</div>
+    <button class="bcopy" onclick="copySQL()">نسخ الكود</button>
+    <p style="font-size:12px;color:var(--mut);margin-bottom:8px;font-weight:500;">② أدخل بيانات الاتصال من Project Settings → API</p>
+    <div class="sf"><label>Project URL</label><input id="sup-url" placeholder="https://xxxx.supabase.co" dir="ltr"></div>
+    <div class="sf"><label>anon public key</label><input id="sup-key" placeholder="" dir="ltr"></div>
+    <button class="bconn" onclick="connectSB()">اتصل وابدأ النظام</button>
+    <div class="setup-err" id="setup-err"></div>
   </div>
 </div>
 
@@ -191,8 +251,8 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
     <div class="lic">🔍</div>
     <div class="lit">نظام متابعة الخطة التصحيحية</div>
     <div class="lis">إدارة الأداء والجودة<br>أدخل بيانات الدخول للمتابعة</div>
-    <label class="ll">البريد الإلكتروني</label>
-    <input class="li" id="li-u" type="email" placeholder="example@domain.com" autocomplete="username" dir="ltr">
+    <label class="ll">اسم المستخدم</label>
+    <input class="li" id="li-u" type="text" placeholder="اسم المستخدم" autocomplete="username">
     <label class="ll">كلمة المرور</label>
     <input class="li" id="li-p" type="password" placeholder="كلمة المرور" autocomplete="current-password">
     <button class="lb" onclick="doLogin()">دخول إلى النظام</button>
@@ -248,6 +308,7 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
     </div>
 
     <!-- ADMIN VIEW -->
+
     <div id="av" style="display:none;">
       <div class="atabs">
         <button class="atab on" onclick="stab('ov',this)">نظرة عامة</button>
@@ -299,314 +360,404 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
           <div class="fg2" style="margin-top:10px;"><label>تفاصيل الملاحظة</label><textarea id="n-fu" rows="4" placeholder="النص الكامل للملاحظة..."></textarea></div>
           <div style="margin-top:14px;"><button class="badd" onclick="addObs()">إضافة الملاحظة</button></div>
         </div>
-        <div style="margin-top:30px;">
-          <div class="sh"><span class="st">الملاحظات التي أضفتها</span></div>
-          <div class="olist" id="my-added-list"></div>
-        </div>
-      </div>
+       <div style="margin-top:30px;">
+        <div class="sh">
+         <span class="st">الملاحظات التي أضفتها</span>
+       </div>
+
+       <div class="olist" id="my-added-list"></div>
+       </div>
+    </div>
 
       <!-- DEPT DETAIL -->
-      <div class="tp" id="tp-dt">
-        <div class="dgrid" id="dept-grid"></div>
-        <div class="sh"><span class="st" id="dt-title">—</span></div>
-        <div class="olist" id="dt-list"></div>
-      </div>
-    </div>
-  </div>
+<div class="tp" id="tp-dt">
+  <div class="dgrid" id="dept-grid"></div>
+  <div class="sh"><span class="st" id="dt-title">—</span></div>
+  <div class="olist" id="dt-list"></div>
+</div>
+      
+ </div>
 </div>
 
-<div class="toast" id="toast"></div>
+ <div class="toast" id="toast"></div>
 
 <script>
 // ══ CONSTANTS ═══════════════════════════════════════════════
-const SRC_N = { field:'المخالفات', meeting:'الزيارات', complaint:'الاعتراضات', other:'أخرى' };
-const S_LBL = { pending:'لم تُعالَج', progress:'قيد المعالجة', done:'مكتملة' };
-const S_CLS = { pending:'sp0', progress:'sp1', done:'sp2' };
-const P_CLS = { high:'ph2', mid:'pm', low:'plo' };
-const P_LBL = { high:'عالية', mid:'متوسطة', low:'منخفضة' };
+<script>
+const CFG_KEY='insp_cfg_v2';
+const USR_KEY='insp_usr_v3';
+const EJS_KEY='insp_ejs_v1';
 
-// ══ CONFIG — ضع بياناتك هنا ══════════════════════════════════
 const SUPABASE_URL = 'https://wrxnwqycukusotagvqpe.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_EnWCdGcw3g9HZJctY0wcEw_iHhCvqVZ';
 
-// ══ STATE ════════════════════════════════════════════════════
-let SB = null, CU = null, aFil = 'all', dFil = 'all', selDept = '', openId = null;
+const SRC_N={field:'المخالفات',meeting:'الزيارات',complaint:'الاعتراضات',other:'أخرى'};
+const S_LBL={pending:'لم تُعالَج',progress:'قيد المعالجة',done:'مكتملة'};
+const S_CLS={pending:'sp0',progress:'sp1',done:'sp2'};
+const P_CLS={high:'ph2',mid:'pm',low:'plo'};
+const P_LBL={high:'عالية',mid:'متوسطة',low:'منخفضة'};
 
-// ══ HELPERS ══════════════════════════════════════════════════
-const $ = id => document.getElementById(id);
-const $s = (id, v) => { const e = $(id); if (e) e.textContent = v; };
+let SB=null, CU=null, USERS=[], DEPTS=[], aFil='all', dFil='all', selDept='', openId=null;
 
-function showEl(id, flex) {
-  const el = $(id);
-  if (!el) return;
-  el.style.display = flex ? 'flex' : 'block';
-}
-function hideEl(id) {
-  const el = $(id);
-  if (el) el.style.display = 'none';
-}
+const $=id=>document.getElementById(id);
+const $s=(id,v)=>{const e=$(id); if(e)e.textContent=v;};
+const show=id=>$(id).style.display=id==='login-screen'?'flex':'block';
+const hide=id=>$(id).style.display='none';
 
-function toast(msg) {
-  const t = $('toast');
-  t.textContent = msg;
+function toast(msg){
+  const t=$('toast');
+  t.textContent=msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-function chOn(cid, el) {
-  document.querySelectorAll('#' + cid + ' .chip').forEach(c => c.classList.remove('on'));
-  el.classList.add('on');
+function chOn(cid,el){
+  document.querySelectorAll('#'+cid+' .chip').forEach(c=>c.classList.remove('on'));
+  if(el) el.classList.add('on');
 }
 
-function getDeptName(key) {
-  // يجلب الاسم من الـ cache المحلي إن وُجد
-  return deptCache[key] || key;
+function getDeptName(key){
+  const d=DEPTS.find(x=>x.dept===key);
+  return d ? d.label : key;
 }
 
-// Cache للأقسام
-let deptCache = {};
+async function initSB(url,key){
+  try{
+    SB=window.supabase.createClient(url,key);
+    const {error}=await SB.from('observations').select('id').limit(1);
+    if(error) throw error;
+    hide('setup');
+    return true;
+  }catch(e){
+    console.log('INIT ERROR:',e);
+    return false;
+  }
+}
 
-// ══ INIT ═════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  const dtEl = $('n-dt');
-  if (dtEl) dtEl.valueAsDate = new Date();
+function copySQL(){
+  navigator.clipboard.writeText($('sql-box').textContent);
+  toast('تم نسخ الكود ✓');
+}
 
-  ['li-u', 'li-p'].forEach(id => {
-    const el = $(id);
-    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  });
+async function connectSB(){
+  const ok=await initSB(SUPABASE_URL,SUPABASE_KEY);
+  if(!ok){$('setup-err').textContent='تعذّر الاتصال';return;}
+  show('login-screen');
+}
 
-  // إنشاء الاتصال بـ Supabase فوراً
-  SB = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+function resetSB(){
+  if(!confirm('مسح بيانات الاتصال؟')) return;
+  localStorage.removeItem(CFG_KEY);
+  logout();
+  hide('login-screen');
+  show('setup');
+}
 
-  // الاستماع لتغيير حالة المصادقة — هذا يعالج الريفريش تلقائياً
-  SB.auth.onAuthStateChange(async (event, session) => {
+async function restoreSession(){
+  const ok=await initSB(SUPABASE_URL,SUPABASE_KEY);
+  if(!ok){show('login-screen');return;}
 
-    if (event === 'SIGNED_OUT' || !session) {
-      // تسجيل خروج أو لا يوجد جلسة
-      CU = null;
-      openId = null;
-      aFil = 'all';
-      dFil = 'all';
-      hideEl('app');
-      hideEl('loading-screen');
-      const remEl = $('rem');
-      if (remEl) remEl.style.display = 'none';
-      showEl('login-screen', true);
-      return;
-    }
+  const {data}=await SB.auth.getSession();
 
-    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-      await loadUserSession(session);
-    }
-  });
-});
-
-// ══ تحميل بيانات المستخدم بعد التحقق ═══════════════════════
-async function loadUserSession(session) {
-  hideEl('login-screen');
-  showEl('loading-screen', false);
-
-  const userId = session.user.id;
-  const email = session.user.email;
-
-  const { data: profile, error } = await SB
-    .from('user_profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
-
-  if (error || !profile) {
-    // مستخدم غير موجود في user_profiles
-    await SB.auth.signOut();
-    hideEl('loading-screen');
-    $('li-e').textContent = 'هذا المستخدم غير مربوط بالنظام';
-    showEl('login-screen', true);
+  if(!data.session){
+    show('login-screen');
     return;
   }
 
-  CU = {
-    id: userId,
-    key: email,
-    role: profile.role,
-    label: profile.label,
-    dept: profile.dept || '',
-    email: email
+  const user=data.session.user;
+  const {data:profile,error}=await SB
+    .from('user_profiles')
+    .select('*')
+    .eq('id',user.id)
+    .single();
+
+  if(error || !profile){
+    show('login-screen');
+    return;
+  }
+
+  CU={
+    id:user.id,
+    key:user.email,
+    role:profile.role,
+    label:profile.label,
+    dept:profile.dept || '',
+    email:user.email
   };
 
-  hideEl('loading-screen');
-  showEl('app');
-  $s('nav-u', CU.label);
-  $s('nav-sub', CU.role === 'dept' ? 'واجهة القسم' : 'لوحة المدير');
+  await openAppByRole();
+}
 
-  if (CU.role === 'admin' || CU.role === 'limited_admin') {
-    showEl('av');
-    hideEl('dv');
+async function openAppByRole(){
+  hide('login-screen');
+  show('app');
 
-    // إعادة ضبط التابات
-    document.querySelectorAll('.atab').forEach(t => t.classList.remove('on'));
-    document.querySelectorAll('.tp').forEach(t => t.classList.remove('show'));
-    const ovTab = document.querySelector("button[onclick=\"stab('ov',this)\"]");
-    if (ovTab) ovTab.classList.add('on');
-    const ovPanel = $('tp-ov');
-    if (ovPanel) ovPanel.classList.add('show');
+  $s('nav-u',CU.label);
+  $s('nav-sub',CU.role==='dept'?'واجهة القسم':'لوحة المدير');
+
+  if(CU.role==='admin' || CU.role==='limited_admin'){
+    show('av');
+    hide('dv');
+
+    document.querySelectorAll('.atab').forEach(t=>{
+      t.style.display='inline-block';
+      t.classList.remove('on');
+    });
+
+    document.querySelectorAll('.tp').forEach(t=>t.classList.remove('show'));
+
+    const ovTab=document.querySelector("button[onclick=\"stab('ov',this)\"]");
+    if(ovTab) ovTab.classList.add('on');
+    $('tp-ov').classList.add('show');
 
     await buildDeptFilter();
     await renderAdmin();
     await renderDeptTab();
 
-  } else {
-    showEl('dv');
-    hideEl('av');
-    $s('d-title', 'ملاحظات ' + CU.label);
+  }else{
+    show('dv');
+    hide('av');
+    $s('d-title','ملاحظات '+CU.label);
     await renderDept();
   }
 
   checkReminder();
 }
 
-// ══ LOGIN ════════════════════════════════════════════════════
-async function doLogin() {
-  const email = $('li-u').value.trim().toLowerCase();
-  const password = $('li-p').value;
+async function doLogin(){
+  const email=$('li-u').value.trim().toLowerCase();
+  const password=$('li-p').value;
 
-  if (!email || !password) {
-    $('li-e').textContent = 'أدخل البريد الإلكتروني وكلمة المرور';
+  if(!email || !password){
+    $('li-e').textContent='أدخل الإيميل وكلمة المرور';
     return;
   }
 
-  $('li-e').textContent = 'جاري تسجيل الدخول...';
+  $('li-e').textContent='جاري تسجيل الدخول...';
 
-  const { data, error } = await SB.auth.signInWithPassword({ email, password });
+  const {data,error}=await SB.auth.signInWithPassword({email,password});
 
-  if (error) {
-    $('li-e').textContent = 'بيانات الدخول غير صحيحة';
+  if(error){
+    console.log('LOGIN ERROR:',error);
+    $('li-e').textContent=error.message;
     return;
   }
 
-  $('li-e').textContent = '';
-  // onAuthStateChange سيتولى الباقي تلقائياً
+  const userId=data.user.id;
+
+  const {data:profile,error:profileError}=await SB
+    .from('user_profiles')
+    .select('*')
+    .eq('id',userId)
+    .single();
+
+  if(profileError || !profile){
+    $('li-e').textContent='هذا المستخدم غير مربوط بالنظام';
+    return;
+  }
+
+  CU={
+    id:userId,
+    key:email,
+    role:profile.role,
+    label:profile.label,
+    dept:profile.dept || '',
+    email:email
+  };
+
+  $('li-e').textContent='';
+  await openAppByRole();
 }
 
-async function logout() {
+async function logout(){
   await SB.auth.signOut();
-  // onAuthStateChange سيتولى إخفاء التطبيق وإظهار شاشة الدخول
-  $('li-u').value = '';
-  $('li-p').value = '';
+  CU=null;
+  openId=null;
+  aFil='all';
+  dFil='all';
+
+  hide('app');
+  hide('av');
+  hide('dv');
+
+  $('rem').style.display='none';
+  $('li-u').value='';
+  $('li-p').value='';
+
+  show('login-screen');
 }
 
-// ══ REMINDER ════════════════════════════════════════════════
-async function checkReminder() {
-  if (!SB || !CU) return;
-  const cutoff = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString();
-  let q = SB.from('observations').select('id').neq('status', 'done').lt('added', cutoff);
-  if (CU.role === 'dept') q = q.eq('dept', CU.dept);
-  const { data } = await q;
-  if (data && data.length) {
-    $('rem-txt').innerHTML = `<strong>تذكير:</strong> يوجد <strong>${data.length}</strong> ملاحظة تجاوزت 15 يوماً دون إغلاق.`;
-    $('rem').style.display = 'flex';
+async function checkReminder(){
+  if(!SB || !CU) return;
+
+  const cutoff=new Date(Date.now()-15*24*60*60*1000).toISOString();
+  let q=SB.from('observations').select('id').neq('status','done').lt('added',cutoff);
+
+  if(CU.role==='dept') q=q.eq('dept',CU.dept);
+
+  const {data}=await q;
+
+  if(data && data.length){
+    $('rem-txt').innerHTML=<strong>تذكير:</strong> يوجد <strong>${data.length}</strong> ملاحظة تجاوزت 15 يوماً دون إغلاق.;
+    $('rem').style.display='flex';
   }
 }
 
-// ══ DEPT VIEW ════════════════════════════════════════════════
-async function renderDept() {
-  $('d-list').innerHTML = '<div class="loading-row">جاري التحميل...</div>';
-  const { data: all } = await SB.from('observations').select('*').eq('dept', CU.dept).order('added', { ascending: false });
-  if (!all) return;
-  const don = all.filter(o => o.status === 'done').length;
-  const prg = all.filter(o => o.status === 'progress').length;
-  const pnd = all.filter(o => o.status === 'pending').length;
-  const pct = all.length ? Math.round(don / all.length * 100) : 0;
-  $s('d-tot', all.length); $s('d-pnd', pnd); $s('d-prg', prg); $s('d-don', don);
-  $s('d-pct', pct + '%'); $('d-bar').style.width = pct + '%';
-  const f = dFil === 'all' ? all : all.filter(o => o.status === dFil);
-  $('d-list').innerHTML = f.length ? f.map(o => card(o, false)).join('') : '<div class="empty"><div class="ei">✅</div>لا توجد ملاحظات بهذا الفلتر</div>';
+async function renderDept(){
+  $('d-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
+
+  const {data:all}=await SB
+    .from('observations')
+    .select('*')
+    .eq('dept',CU.dept)
+    .order('added',{ascending:false});
+
+  if(!all) return;
+
+  const don=all.filter(o=>o.status==='done').length;
+  const prg=all.filter(o=>o.status==='progress').length;
+  const pnd=all.filter(o=>o.status==='pending').length;
+  const pct=all.length?Math.round(don/all.length*100):0;
+
+  $s('d-tot',all.length);
+  $s('d-pnd',pnd);
+  $s('d-prg',prg);
+  $s('d-don',don);
+  $s('d-pct',pct+'%');
+  $('d-bar').style.width=pct+'%';
+
+  const f=dFil==='all'?all:all.filter(o=>o.status===dFil);
+
+  $('d-list').innerHTML=f.length
+    ? f.map(o=>card(o,false)).join('')
+    : '<div class="empty"><div class="ei">✅</div>لا توجد ملاحظات بهذا الفلتر</div>';
 }
 
-function df(el, f) { dFil = f; openId = null; chOn('d-chips', el); renderDept(); }
-
-// ══ ADMIN OVERVIEW ═══════════════════════════════════════════
-async function renderAdmin() {
-  $('a-list').innerHTML = '<div class="loading-row">جاري التحميل...</div>';
-  const { data: all } = await SB.from('observations').select('*').order('added', { ascending: false });
-  if (!all) return;
-  const don = all.filter(o => o.status === 'done').length;
-  const prg = all.filter(o => o.status === 'progress').length;
-  const pnd = all.filter(o => o.status === 'pending').length;
-  const pct = all.length ? Math.round(don / all.length * 100) : 0;
-  $s('a-tot', all.length); $s('a-pnd', pnd); $s('a-prg', prg); $s('a-don', don);
-  $s('a-pct', pct + '%'); $('a-bar').style.width = pct + '%';
-  let filt = all;
-  const deptKeys = Object.keys(deptCache);
-  if (deptKeys.includes(aFil)) filt = all.filter(o => o.dept === aFil);
-  else if (['pending', 'progress', 'done'].includes(aFil)) filt = all.filter(o => o.status === aFil);
-  $('a-list').innerHTML = filt.length ? filt.map(o => card(o, true)).join('') : '<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات</div>';
+function df(el,f){
+  dFil=f;
+  openId=null;
+  chOn('d-chips',el);
+  renderDept();
 }
 
-function af(el, f) { aFil = f; openId = null; chOn('a-chips', el); chOn('dept-filter-chips', el); renderAdmin(); }
+async function renderAdmin(){
+  $('a-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
 
-// ══ بناء فلتر الأقسام ══════════════════════════════════════
-async function buildDeptFilter() {
-  const c = $('dept-filter-chips');
-  if (c) c.innerHTML = '';
+  const {data:all}=await SB
+    .from('observations')
+    .select('*')
+    .order('added',{ascending:false});
 
-  const { data, error } = await SB
+  if(!all) return;
+
+  const don=all.filter(o=>o.status==='done').length;
+  const prg=all.filter(o=>o.status==='progress').length;
+  const pnd=all.filter(o=>o.status==='pending').length;
+  const pct=all.length?Math.round(don/all.length*100):0;
+
+  $s('a-tot',all.length);
+  $s('a-pnd',pnd);
+  $s('a-prg',prg);
+  $s('a-don',don);
+  $s('a-pct',pct+'%');
+  $('a-bar').style.width=pct+'%';
+
+  let filt=all;
+  const deptKeys=DEPTS.map(d=>d.dept);
+
+  if(deptKeys.includes(aFil)) filt=all.filter(o=>o.dept===aFil);
+  else if(['pending','progress','done'].includes(aFil)) filt=all.filter(o=>o.status===aFil);
+
+  $('a-list').innerHTML=filt.length
+    ? filt.map(o=>card(o,true)).join('')
+    : '<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات</div>';
+}
+
+function af(el,f){
+  aFil=f;
+  openId=null;
+  chOn('a-chips',el);
+  chOn('dept-filter-chips',el);
+  renderAdmin();
+}
+
+async function buildDeptFilter(){
+  const c=$('dept-filter-chips');
+  if(c) c.innerHTML='';
+
+  const {data,error}=await SB
     .from('departments')
     .select('*')
-    .order('label', { ascending: true });
+    .order('label',{ascending:true});
 
-  if (error || !data) return;
+  if(error || !data){
+    console.log('DEPARTMENTS ERROR:',error);
+    return;
+  }
 
-  // تحديث الـ cache
-  deptCache = {};
-  data.forEach(d => { deptCache[d.dept] = d.label; });
+  DEPTS=data;
 
-  data.forEach(d => {
-    if (!c) return;
-    const b = document.createElement('button');
-    b.className = 'chip';
-    b.textContent = d.label;
-    b.onclick = () => af(b, d.dept);
+  data.forEach(d=>{
+    if(!c) return;
+    const b=document.createElement('button');
+    b.className='chip';
+    b.textContent=d.label;
+    b.onclick=()=>af(b,d.dept);
     c.appendChild(b);
   });
 
-  const sel = $('n-d');
-  if (sel) {
-    sel.innerHTML = '<option value="">— اختر —</option>';
-    data.forEach(d => {
-      const o = document.createElement('option');
-      o.value = d.dept;
-      o.textContent = d.label;
-      sel.appendChild(o);
-    });
-  }
+  const sel=$('n-d');
+  sel.innerHTML='<option value="">— اختر —</option>';
+
+  data.forEach(d=>{
+    const o=document.createElement('option');
+    o.value=d.dept;
+    o.textContent=d.label;
+    sel.appendChild(o);
+  });
 }
 
-// ══ DEPT TAB ════════════════════════════════════════════════
-async function renderDeptTab() {
-  const { data: depts, error: deptErr } = await SB
+async function renderDeptTab(){
+  const {data:depts,error:deptErr}=await SB
     .from('departments')
     .select('dept,label')
-    .order('label', { ascending: true });
+    .order('label',{ascending:true});
 
-  if (deptErr || !depts || !depts.length) {
-    $('dept-grid').innerHTML = '<div class="empty">لا توجد أقسام مضافة</div>';
-    $s('dt-title', '—');
-    $('dt-list').innerHTML = '';
+  if(deptErr){
+    console.log('DEPT TAB ERROR:',deptErr);
+    $('dept-grid').innerHTML='<div class="empty">خطأ في تحميل الأقسام</div>';
     return;
   }
 
-  const { data: all } = await SB.from('observations').select('*');
+  DEPTS=depts || [];
 
-  if (!selDept) selDept = depts[0].dept;
+  const {data:all,error:obsErr}=await SB
+    .from('observations')
+    .select('*');
 
-  $('dept-grid').innerHTML = depts.map(d => {
-    const obs = (all || []).filter(o => o.dept === d.dept);
-    const don = obs.filter(o => o.status === 'done').length;
-    const prg = obs.filter(o => o.status === 'progress').length;
-    const pnd = obs.filter(o => o.status === 'pending').length;
-    const pct = obs.length ? Math.round(don / obs.length * 100) : 0;
-    return `<div class="dc${d.dept === selDept ? ' sel' : ''}" onclick="selDD('${d.dept}')">
+  if(obsErr){
+    console.log('OBS ERROR:',obsErr);
+    $('dt-list').innerHTML='<div class="empty">خطأ في تحميل الملاحظات</div>';
+    return;
+  }
+
+  if(!depts || !depts.length){
+    $('dept-grid').innerHTML='<div class="empty">لا توجد أقسام مضافة</div>';
+    $('dt-title').textContent='—';
+    $('dt-list').innerHTML='';
+    return;
+  }
+
+  if(!selDept) selDept=depts[0].dept;
+
+  $('dept-grid').innerHTML=depts.map(d=>{
+    const obs=(all||[]).filter(o=>o.dept===d.dept);
+    const don=obs.filter(o=>o.status==='done').length;
+    const prg=obs.filter(o=>o.status==='progress').length;
+    const pnd=obs.filter(o=>o.status==='pending').length;
+    const pct=obs.length?Math.round(don/obs.length*100):0;
+
+    return `<div class="dc${d.dept===selDept?' sel':''}" onclick="selDD('${d.dept}')">
       <div class="dn">${d.label}</div>
       <div style="display:flex;justify-content:space-between">
         <span style="font-size:11px;color:var(--mut)">الإنجاز</span>
@@ -622,243 +773,327 @@ async function renderDeptTab() {
     </div>`;
   }).join('');
 
-  await selDD(selDept, all);
+  await selDD(selDept,all);
 }
 
-async function selDD(d, preloaded) {
-  selDept = d;
-  openId = null;
+async function selDD(d,preloaded){
+  selDept=d;
+  openId=null;
 
-  document.querySelectorAll('.dc').forEach(c => {
-    const fn = c.getAttribute('onclick') || '';
-    c.classList.toggle('sel', fn.includes(`'${d}'`));
+  document.querySelectorAll('.dc').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.dc').forEach(c=>{
+    if(c.getAttribute('onclick') && c.getAttribute('onclick').includes(d)){
+      c.classList.add('sel');
+    }
   });
 
-  $s('dt-title', 'ملاحظات ' + (deptCache[d] || d));
+  $s('dt-title','ملاحظات '+getDeptName(d));
 
   let obs;
-  if (preloaded) {
-    obs = preloaded.filter(o => o.dept === d);
-  } else {
-    const { data, error } = await SB
+
+  if(preloaded){
+    obs=preloaded.filter(o=>o.dept===d);
+  }else{
+    const {data,error}=await SB
       .from('observations')
       .select('*')
-      .eq('dept', d)
-      .order('added', { ascending: false });
-    if (error) { $('dt-list').innerHTML = '<div class="empty">خطأ في التحميل</div>'; return; }
-    obs = data || [];
+      .eq('dept',d)
+      .order('added',{ascending:false});
+
+    if(error){
+      console.log('SEL DEPT ERROR:',error);
+      $('dt-list').innerHTML='<div class="empty">خطأ في تحميل ملاحظات القسم</div>';
+      return;
+    }
+
+    obs=data || [];
   }
 
-  $('dt-list').innerHTML = obs.length
-    ? obs.map(o => card(o, true)).join('')
+  $('dt-list').innerHTML=obs.length
+    ? obs.map(o=>card(o,true)).join('')
     : '<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات لهذا القسم</div>';
 }
 
-// ══ ADD OBS ══════════════════════════════════════════════════
-async function addObs() {
-  const dept = $('n-d').value;
-  const short = $('n-sh').value.trim();
+async function addObs(){
+  const dept=$('n-d').value;
+  const short=$('n-sh').value.trim();
 
-  if (!dept) { toast('يرجى اختيار القسم المعني'); return; }
-  if (!short) { toast('يرجى كتابة عنوان الملاحظة'); return; }
+  if(!dept){
+    toast('يرجى اختيار القسم المعني');
+    return;
+  }
 
-  const { error } = await SB.from('observations').insert({
+  if(!short){
+    toast('يرجى كتابة عنوان الملاحظة');
+    return;
+  }
+
+  const {error}=await SB.from('observations').insert({
     dept,
-    priority: $('n-p').value,
-    source: $('n-s').value,
-    obs_date: $('n-dt').value || new Date().toISOString().split('T')[0],
+    priority:$('n-p').value,
+    source:$('n-s').value,
+    obs_date:$('n-dt').value || new Date().toISOString().split('T')[0],
     short,
-    full_text: $('n-fu').value.trim() || short,
-    status: 'pending',
-    action: '',
-    deadline: null,
-    created_by: CU.id
+    full_text:$('n-fu').value.trim() || short,
+    status:'pending',
+    action:'',
+    deadline:null,
+    created_by:CU.id
   });
 
-  if (error) { toast('خطأ في الإضافة'); return; }
+  if(error){
+    console.log('ADD OBS ERROR:',error);
+    toast('خطأ في الإضافة');
+    return;
+  }
 
-  ['n-d', 'n-sh', 'n-fu'].forEach(id => $(id).value = '');
-  $('n-p').value = 'high';
-  $('n-s').value = 'field';
-  $('n-dt').valueAsDate = new Date();
+  ['n-d','n-sh','n-fu'].forEach(id=>$(id).value='');
+  $('n-p').value='high';
+  $('n-s').value='field';
+  $('n-dt').valueAsDate=new Date();
 
   toast('تمت إضافة الملاحظة ✓');
   await renderAdmin();
   await renderDeptTab();
-  await renderMyAdded();
 }
 
-// ══ CARD ════════════════════════════════════════════════════
-function card(o, isAdmin) {
-  const isOpen = openId === o.id;
-  const tag = isAdmin ? `<span class="dtag">${getDeptName(o.dept)}</span>`: '';
-  const src = SRC_N[o.source] || '';
+async function loadActions(id){
+  const box=$('acts'+id);
+  if(!box) return;
+
+  box.innerHTML='<div class="loading-row">جاري تحميل الإجراءات...</div>';
+
+  const {data,error}=await SB
+    .from('observation_actions')
+    .select('*')
+    .eq('observation_id',id)
+    .order('created_at',{ascending:false});
+
+  if(error){
+    console.log('ACTIONS ERROR:',error);
+    box.innerHTML='<div class="empty">خطأ في تحميل الإجراءات</div>';
+    return;
+  }
+
+  if(!data || !data.length){
+    box.innerHTML='<div class="empty">لا توجد إجراءات محفوظة بعد</div>';
+    return;
+  }
+
+  box.innerHTML='<div class="timeline">'+data.map(a=>{
+    const dt=new Date(a.created_at).toLocaleString('ar-SA');
+    const st=S_LBL[a.status] || a.status;
+
+    return '<div class="titem">'+
+      '<div class="tmeta">'+dt+' | '+st+'</div>'+
+      '<div class="ttext">'+a.action_text+'</div>'+
+    '</div>';
+  }).join('')+'</div>';
+}
+
+function card(o,isAdmin){
+  const isOpen=openId===o.id;
+  const tag=isAdmin?<span class="dtag">${getDeptName(o.dept)}</span>:'';
+  const src=SRC_N[o.source] || '';
+
   return `<div class="oc" id="c${o.id}">
     <div class="oh" onclick="tog(${o.id})">
       <span class="on2">#${String(o.id).slice(-4)}</span>
       <span class="op ${P_CLS[o.priority || 'mid']}"></span>
       <span class="os2">${o.short}</span>
-      <div class="om">${tag}<span class="od">${o.obs_date || ''}</span>${src ? `<span class="stag">${src}</span>` : ''}<span class="spill ${S_CLS[o.status]}">${S_LBL[o.status]}</span><span class="ochv${isOpen ? ' open' : ''}">&#9654;</span></div>
+      <div class="om">
+        ${tag}
+        <span class="od">${o.obs_date || ''}</span>
+        ${src?<span class="stag">${src}</span>:''}
+        <span class="spill ${S_CLS[o.status]}">${S_LBL[o.status]}</span>
+        <span class="ochv${isOpen?' open':''}">&#9654;</span>
+      </div>
     </div>
+
     ${isOpen ? `<div class="ob open">
       <div class="odt">${o.full_text || o.short}</div>
+
       <div class="fgrid">
-        <div class="fg"><label>الحالة</label>
+        <div class="fg">
+          <label>الحالة</label>
           <select id="s${o.id}">
-            <option value="pending"${o.status === 'pending' ? ' selected' : ''}>لم تُعالَج</option>
-            <option value="progress"${o.status === 'progress' ? ' selected' : ''}>قيد المعالجة</option>
-            <option value="done"${o.status === 'done' ? ' selected' : ''}>مكتملة</option>
+            <option value="pending"${o.status==='pending'?' selected':''}>لم تُعالَج</option>
+            <option value="progress"${o.status==='progress'?' selected':''}>قيد المعالجة</option>
+            <option value="done"${o.status==='done'?' selected':''}>مكتملة</option>
           </select>
         </div>
-        <div class="fg"><label>الموعد المتوقع للإنجاز</label><input type="date" id="dl${o.id}" value="${o.deadline || ''}"></div>
+
+        <div class="fg">
+          <label>الموعد المتوقع للإنجاز</label>
+          <input type="date" id="dl${o.id}" value="${o.deadline || ''}">
+        </div>
+
         <div class="fg ff">
           <label>سجل الإجراءات السابقة</label>
           <div id="acts${o.id}"></div>
         </div>
+
         <div class="fg ff">
           <label>إضافة إجراء تصحيحي جديد</label>
           <textarea id="ac${o.id}" placeholder="اكتب الإجراء الجديد هنا..."></textarea>
         </div>
       </div>
+
       <div class="fa">
-        ${CU.role === 'admin' ? `<button class="bdel" onclick="delObs(${o.id},event)">حذف</button>` : '<span></span>'}
+        ${CU && CU.role==='admin' ? <button class="bdel" onclick="delObs(${o.id},event)">حذف</button> : '<span></span>'}
         <button class="bsv" onclick="saveCard(${o.id})">حفظ التحديث</button>
       </div>
     </div>` : ''}
   </div>`;
 }
 
-async function tog(id) {
-  openId = openId === id ? null : id;
+async function tog(id){
+  openId=openId===id?null:id;
   await rerender();
-  if (openId) await loadActions(id);
+
+  if(openId){
+    await loadActions(id);
+  }
 }
 
-async function loadActions(id) {
-  const box = $('acts' + id);
-  if (!box) return;
-  box.innerHTML = '<div class="loading-row">جاري تحميل الإجراءات...</div>';
-  const { data, error } = await SB
-    .from('observation_actions')
-    .select('*')
-    .eq('observation_id', id)
-    .order('created_at', { ascending: false });
-  if (error || !data || !data.length) {
-    box.innerHTML = '<div class="empty">لا توجد إجراءات محفوظة بعد</div>';
+async function saveCard(id){
+  const newAction=$('ac'+id).value.trim();
+  const newStatus=$('s'+id).value;
+  const newDeadline=$('dl'+id).value || null;
+
+  if(!newAction){
+    toast('اكتب الإجراء التصحيحي أولاً');
     return;
   }
-  box.innerHTML = '<div class="timeline">' + data.map(a => {
-    const dt = new Date(a.created_at).toLocaleString('ar-SA');
-    const st = S_LBL[a.status] || a.status;
-    return `<div class="titem"><div class="tmeta">${dt} | ${st}</div><div class="ttext">${a.action_text}</div></div>`;
-  }).join('') + '</div>';
-}
 
-async function saveCard(id) {
-  const newAction = $('ac' + id).value.trim();
-  const newStatus = $('s' + id).value;
-  const newDeadline = $('dl' + id).value || null;
+  const {error:insertError}=await SB
+    .from('observation_actions')
+    .insert({
+      observation_id:id,
+      status:newStatus,
+      action_text:newAction
+    });
 
-  if (!newAction) { toast('اكتب الإجراء التصحيحي أولاً'); return; }
+  if(insertError){
+    console.log('INSERT ACTION ERROR:',insertError);
+    toast('خطأ في حفظ الإجراء');
+    return;
+  }
 
-  const { error: insertError } = await SB.from('observation_actions').insert({
-    observation_id: id,
-    status: newStatus,
-    action_text: newAction
-  });
+  const {error:updateError}=await SB
+    .from('observations')
+    .update({
+      status:newStatus,
+      deadline:newDeadline
+    })
+    .eq('id',id);
 
-  if (insertError) { toast('خطأ في حفظ الإجراء'); return; }
+  if(updateError){
+    console.log('UPDATE OBS ERROR:',updateError);
+    toast('تم حفظ الإجراء لكن حدث خطأ في تحديث الحالة');
+    return;
+  }
 
-  const { error: updateError } = await SB.from('observations')
-    .update({ status: newStatus, deadline: newDeadline })
-    .eq('id', id);
-
-  if (updateError) { toast('تم حفظ الإجراء لكن حدث خطأ في تحديث الحالة'); return; }
-
-  openId = id;
+  openId=id;
   toast('تم حفظ الإجراء ✓');
+
   await rerender();
   await loadActions(id);
 }
 
-async function delObs(id, e) {
+async function delObs(id,e){
   e.stopPropagation();
-  if (!confirm('حذف هذه الملاحظة نهائياً؟')) return;
-  await SB.from('observations').delete().eq('id', id);
-  if (openId === id) openId = null;
+
+  if(CU.role!=='admin'){
+    toast('ليس لديك صلاحية الحذف');
+    return;
+  }
+
+  if(!confirm('حذف هذه الملاحظة نهائياً؟')) return;
+
+  await SB.from('observations').delete().eq('id',id);
+
+  if(openId===id) openId=null;
+
   toast('تم الحذف');
   rerender();
 }
 
-async function rerender() {
-  if (!CU) return;
-  if (CU.role === 'admin' || CU.role === 'limited_admin') {
+async function rerender(){
+  if(!CU) return;
+
+  if(CU.role==='admin' || CU.role==='limited_admin'){
     await renderAdmin();
     await renderDeptTab();
-  } else {
+  }else{
     await renderDept();
   }
-  if (openId) await loadActions(openId);
+
+  if(openId){
+    await loadActions(openId);
+  }
 }
 
-// ══ EXCEL ════════════════════════════════════════════════════
-async function exportXL(all) {
-  let q = SB.from('observations').select('*').order('added', { ascending: false });
-  if (!all) q = q.eq('dept', CU.dept);
-  const { data } = await q;
-  if (!data || !data.length) { toast('لا توجد بيانات للتصدير'); return; }
-  const rows = data.map(o => ({
-    'الرقم': o.id,
-    'القسم': getDeptName(o.dept),
-    'عنوان الملاحظة': o.short,
-    'تفاصيل الملاحظة': o.full_text || '',
-    'المصدر': SRC_N[o.source] || '',
-    'الأولوية': P_LBL[o.priority] || '',
-    'الحالة': S_LBL[o.status] || '',
-    'تاريخ الملاحظة': o.obs_date || '',
-    'تاريخ الإضافة': o.added ? o.added.split('T')[0] : '',
-    'الإجراء المتخذ': o.action || '',
-    'الموعد المتوقع': o.deadline || '',
+async function exportXL(all){
+  let q=SB.from('observations').select('*').order('added',{ascending:false});
+
+  if(!all) q=q.eq('dept',CU.dept);
+
+  const {data}=await q;
+
+  if(!data || !data.length){
+    toast('لا توجد بيانات للتصدير');
+    return;
+  }
+
+  const rows=data.map(o=>({
+    'الرقم':o.id,
+    'القسم':getDeptName(o.dept),
+    'عنوان الملاحظة':o.short,
+    'تفاصيل الملاحظة':o.full_text || '',
+    'المصدر':SRC_N[o.source] || '',
+    'الأولوية':P_LBL[o.priority] || '',
+    'الحالة':S_LBL[o.status] || '',
+    'تاريخ الملاحظة':o.obs_date || '',
+    'تاريخ الإضافة':o.added ? o.added.split('T')[0] : '',
+    'الموعد المتوقع':o.deadline || ''
   }));
-  const ws = XLSX.utils.json_to_sheet(rows);
-  ws['!cols'] = [{wch:10},{wch:22},{wch:36},{wch:46},{wch:16},{wch:10},{wch:14},{wch:14},{wch:14},{wch:42},{wch:14}];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'الخطة التصحيحية');
-  XLSX.writeFile(wb, `خطة_تصحيحية_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+  const ws=XLSX.utils.json_to_sheet(rows);
+  const wb=XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb,ws,'الخطة التصحيحية');
+  XLSX.writeFile(wb,خطة_تصحيحية_${new Date().toISOString().split('T')[0]}.xlsx);
+
   toast('تم تصدير Excel ✓');
 }
 
-// ══ MY ADDED (limited_admin) ════════════════════════════════
-async function renderMyAdded() {
-  if (!CU || CU.role !== 'limited_admin') return;
-  const box = $('my-added-list');
-  if (!box) return;
-  box.innerHTML = '<div class="loading-row">جاري التحميل...</div>';
-  const { data, error } = await SB
-    .from('observations')
-    .select('*')
-    .eq('created_by', CU.id)
-    .order('added', { ascending: false });
-  if (error) { box.innerHTML = '<div class="empty">خطأ في التحميل</div>'; return; }
-  box.innerHTML = data && data.length
-    ? data.map(o => card(o, false)).join('')
-    : '<div class="empty">لم تقم بإضافة أي ملاحظات بعد</div>';
-}
-
-// ══ TABS ════════════════════════════════════════════════════
-function stab(name, btn) {
-  document.querySelectorAll('.atab').forEach(t => t.classList.remove('on'));
+function stab(name,btn){
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('on'));
   btn.classList.add('on');
-  ['ov', 'ad', 'dt'].forEach(n => {
-    const tab = $('tp-' + n);
-    if (tab) tab.classList.remove('show');
-  });
-  const activeTab = $('tp-' + name);
-  if (activeTab) activeTab.classList.add('show');
 
-  // تحميل قائمة "الملاحظات التي أضفتها" عند فتح تاب الإضافة
-  if (name === 'ad') renderMyAdded();
+  ['ov','ad','dt'].forEach(n=>{
+    const tab=$('tp-'+n);
+    if(tab) tab.classList.remove('show');
+  });
+
+  const activeTab=$('tp-'+name);
+  if(activeTab) activeTab.classList.add('show');
 }
+
+window.onload=async function(){
+  if($('n-dt')) $('n-dt').valueAsDate=new Date();
+
+  ['li-u','li-p'].forEach(id=>{
+    if($(id)){
+      $(id).addEventListener('keydown',e=>{
+        if(e.key==='Enter') doLogin();
+      });
+    }
+  });
+
+  await restoreSession();
+};
 </script>
 </body>
 </html>
