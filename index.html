@@ -525,6 +525,7 @@ function resetSB(){ if(!confirm('مسح بيانات الاتصال؟')) return;
 
 // ══ LOGIN ════════════════════════════════════════════════════
 async function doLogin(){
+
   const email = $('li-u').value.trim().toLowerCase();
   const password = $('li-p').value;
 
@@ -535,19 +536,16 @@ async function doLogin(){
 
   $('li-e').textContent = 'جاري تسجيل الدخول...';
 
-  console.log('SB:', SB);
-  console.log('email:', email);
-
   const { data, error } = await SB.auth.signInWithPassword({
     email,
     password
   });
 
-if(error){
-  console.log('LOGIN ERROR:', error);
-  $('li-e').textContent = error.message;
-  return;
-}
+  if(error){
+    console.log('LOGIN ERROR:', error);
+    $('li-e').textContent = error.message;
+    return;
+  }
 
   const userId = data.user.id;
 
@@ -577,54 +575,47 @@ if(error){
   show('app');
 
   $s('nav-u', CU.label);
-  $s('nav-sub', CU.role === 'admin' ? 'لوحة المدير' : 'واجهة القسم');
+  $s('nav-sub', CU.role === 'dept' ? 'واجهة القسم' : 'لوحة المدير');
 
-if(CU.role === 'admin' || CU.role === 'limited_admin'){
-  show('av');
+  if(CU.role === 'admin' || CU.role === 'limited_admin'){
 
-  document.querySelectorAll('.atab').forEach(t=>{
-    t.style.display = 'inline-block';
-    t.classList.remove('on');
-  });
+    show('av');
 
-  document.querySelectorAll('.tp').forEach(t=>t.classList.remove('show'));
+    document.querySelectorAll('.atab').forEach(t=>{
+      t.style.display = 'inline-block';
+      t.classList.remove('on');
+    });
 
-  const ovTab = document.querySelector("button[onclick=\"stab('ov',this)\"]");
-  if(ovTab) ovTab.classList.add('on');
+    document.querySelectorAll('.tp').forEach(t=>{
+      t.classList.remove('show');
+    });
 
-  $('tp-ov').classList.add('show');
+    const ovTab = document.querySelector("button[onclick=\"stab('ov',this)\"]");
 
-  await buildDeptFilter();
-  await renderAdmin();
-  await renderDeptTab();
+    if(ovTab){
+      ovTab.classList.add('on');
+    }
 
-} else {
-  show('dv');
-  $s('d-title', 'ملاحظات ' + CU.label);
-  await renderDept();
-}
+    $('tp-ov').classList.add('show');
 
-  document.querySelectorAll('.atab').forEach(t=>t.style.display='none');
-  document.querySelectorAll('.tp').forEach(t=>t.classList.remove('show'));
+    await buildDeptFilter();
+    await renderAdmin();
+    await renderDeptTab();
 
-  const addTab = document.querySelector("button[onclick=\"stab('ad',this)\"]");
-  if(addTab){
-    addTab.style.display='inline-block';
-    addTab.classList.add('on');
+  } else {
+
+    show('dv');
+
+    $s('d-title', 'ملاحظات ' + CU.label);
+
+    await renderDept();
   }
-
-  $('tp-ad').classList.add('show');
-
-} else {
-  show('dv');
-  $s('d-title', 'ملاحظات ' + CU.label);
-  await renderDept();
-}
 
   checkReminder();
 }
 
 async function logout(){
+
   await SB.auth.signOut();
 
   CU = null;
@@ -637,6 +628,7 @@ async function logout(){
   hide('dv');
 
   $('rem').style.display = 'none';
+
   $('li-u').value = '';
   $('li-p').value = '';
 
