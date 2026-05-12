@@ -88,7 +88,31 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 /* ── CHIPS ───────────────────────────────────────────────── */
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
 .st{font-size:15px;font-weight:600;color:var(--navy);}
-.chips{display:flex;gap:6px;flex-wrap:wrap;}
+  
+.chips{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+#dept-filter-chips{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  background:#f8faff;
+  border:1px solid var(--bdr);
+  border-radius:12px;
+  display:flex;
+  gap:8px;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+}
+
+#dept-filter-chips .chip{
+  white-space:nowrap;
+  flex:0 0 auto;
+}
+
 .chip{font-size:11.5px;padding:4px 13px;border-radius:99px;border:1px solid var(--bdr);background:var(--w);color:var(--mut);cursor:pointer;font-family:inherit;transition:all .14s;}
 .chip:hover{border-color:var(--navy);color:var(--navy);}
 .chip.on{background:var(--navy);color:#fff;border-color:var(--navy);}
