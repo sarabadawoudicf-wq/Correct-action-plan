@@ -597,7 +597,7 @@ async function checkReminder(){
   const {data}=await q;
 
   if(data && data.length){
-    $('rem-txt').innerHTML=<strong>تذكير:</strong> يوجد <strong>${data.length}</strong> ملاحظة تجاوزت 15 يوماً دون إغلاق.;
+    $('rem-txt').innerHTML= `<strong>تذكير:</strong> يوجد <strong>${data.length}</strong> ملاحظة تجاوزت 15 يوماً دون إغلاق.`;
     $('rem').style.display='flex';
   }
 }
