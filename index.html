@@ -599,6 +599,7 @@ async function buildDeptFilter(){
   const { data, error } = await SB
     .from('department')
     .select('*');
+    .order('label', { ascending: true });
     
 
   if(error || !data) return;
