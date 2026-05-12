@@ -419,6 +419,14 @@ $('n-dt').valueAsDate = new Date();
   });
 });
 
+$('n-dt').valueAsDate = new Date();
+
+['li-u','li-p'].forEach(id=>{
+  $(id).addEventListener('keydown', e=>{
+    if(e.key === 'Enter') doLogin();
+  });
+});
+
 window.onload = async function(){
 
   USERS = [];
@@ -429,70 +437,77 @@ window.onload = async function(){
 
   const { data } = await SB.auth.getSession();
 
-  if(data.session){
-
-    const user = data.session.user;
-    const userId = user.id;
-    const email = user.email;
-
-    const { data: profile, error } = await SB
-      .from('user_profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if(error || !profile){
-      show('login-screen');
-      return;
-    }
-
-    CU = {
-      id: userId,
-      key: email,
-      role: profile.role,
-      label: profile.label,
-      dept: profile.dept || '',
-      email: email
-    };
-
-    hide('login-screen');
-    show('app');
-
-    $s('nav-u', CU.label);
-    $s('nav-sub', CU.role === 'dept' ? 'واجهة القسم' : 'لوحة المدير');
-
-    if(CU.role === 'admin' || CU.role === 'limited_admin'){
-      show('av');
-
-      document.querySelectorAll('.atab').forEach(t=>{
-        t.style.display = 'inline-block';
-        t.classList.remove('on');
-      });
-
-      document.querySelectorAll('.tp').forEach(t=>t.classList.remove('show'));
-
-      const ovTab = document.querySelector("button[onclick=\"stab('ov',this)\"]");
-      if(ovTab) ovTab.classList.add('on');
-
-      $('tp-ov').classList.add('show');
-
-      await buildDeptFilter();
-      await renderAdmin();
-      await renderDeptTab();
-
-    } else {
-      show('dv');
-      $s('d-title', 'ملاحظات ' + CU.label);
-      await renderDept();
-    }
-
-    checkReminder();
+  if(!data.session){
+    show('login-screen');
     return;
   }
 
-  show('login-screen');
-};
+  const user = data.session.user;
+  const userId = user.id;
+  const email = user.email;
 
+  const { data: profile, error } = await SB
+    .from('user_profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if(error || !profile){
+    show('login-screen');
+    return;
+  }
+
+  CU = {
+    id: userId,
+    key: email,
+    role: profile.role,
+    label: profile.label,
+    dept: profile.dept || '',
+    email: email
+  };
+
+  hide('login-screen');
+  show('app');
+
+  $s('nav-u', CU.label);
+  $s('nav-sub', CU.role === 'dept' ? 'واجهة القسم' : 'لوحة المدير');
+
+  if(CU.role === 'admin' || CU.role === 'limited_admin'){
+
+    show('av');
+
+    document.querySelectorAll('.atab').forEach(t=>{
+      t.style.display = 'inline-block';
+      t.classList.remove('on');
+    });
+
+    document.querySelectorAll('.tp').forEach(t=>{
+      t.classList.remove('show');
+    });
+
+    const ovTab = document.querySelector("button[onclick=\"stab('ov',this)\"]");
+
+    if(ovTab){
+      ovTab.classList.add('on');
+    }
+
+    $('tp-ov').classList.add('show');
+
+    await buildDeptFilter();
+    await renderAdmin();
+    await renderDeptTab();
+
+  } else {
+
+    show('dv');
+
+    $s('d-title', 'ملاحظات ' + CU.label);
+
+    await renderDept();
+  }
+
+  checkReminder();
+};
 // ══ SUPABASE ═════════════════════════════════════════════════
 function copySQL(){ navigator.clipboard.writeText($('sql-box').textContent); toast('تم نسخ الكود ✓'); }
 const SUPABASE_URL = 'https://wrxnwqycukusotagvqpe.supabase.co';
