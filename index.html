@@ -501,6 +501,19 @@ if(error){
 
 if(CU.role === 'admin'){
   show('av');
+
+  document.querySelectorAll('.atab').forEach(t=>{
+    t.style.display = 'inline-block';
+    t.classList.remove('on');
+  });
+
+  document.querySelectorAll('.tp').forEach(t=>t.classList.remove('show'));
+
+  const ovTab = document.querySelector("button[onclick=\"stab('ov',this)\"]");
+  if(ovTab) ovTab.classList.add('on');
+
+  $('tp-ov').classList.add('show');
+
   await buildDeptFilter();
   await renderAdmin();
   await renderDeptTab();
