@@ -414,10 +414,67 @@ function getDeptName(key){ const u=USERS.find(u=>u.dept===key||u.key===key); ret
 $('n-dt').valueAsDate = new Date();
 ['li-u','li-p'].forEach(id=>$(id).addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); }));
 
-window.onload = function(){
-  USERS = [] ;
-  initSB(SUPABASE_URL, SUPABASE_KEY);
-  loadEJSSettings();
+window.onload = async function(){
+
+  USERS = [];
+
+  await initSB(SUPABASE_URL, SUPABASE_KEY);
+
+  const { data } = await SB.auth.getSession();
+
+  if(data.session){
+
+    const user = data.session.user;
+    const userId = user.id;
+    const email = user.email;
+
+    const { data: profile } = await SB
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if(profile){
+
+      CU = {
+        id: userId,
+        key: email,
+        role: profile.role,
+        label: profile.label,
+        dept: profile.dept || '',
+        email: email
+      };
+
+      hide('login-screen');
+      show('app');
+
+      $s('nav-u', CU.label);
+      $s('nav-sub', CU.role === 'dept' ? 'واجهة القسم' : 'لوحة المدير');
+
+      if(CU.role === 'admin' || CU.role === 'limited_admin'){
+
+        show('av');
+
+        await buildDeptFilter();
+        await renderAdmin();
+        await renderDeptTab();
+
+      } else {
+
+        show('dv');
+
+        $s('d-title', 'ملاحظات ' + CU.label);
+
+        await renderDept();
+      }
+
+      checkReminder();
+
+      return;
+    }
+  }
+
+  show('login-screen');
 };
 
 // ══ SUPABASE ═════════════════════════════════════════════════
@@ -499,7 +556,7 @@ if(error){
   $s('nav-u', CU.label);
   $s('nav-sub', CU.role === 'admin' ? 'لوحة المدير' : 'واجهة القسم');
 
-if(CU.role === 'admin'){
+if(CU.role === 'admin' || CU.role === 'limited_admin'){
   show('av');
 
   document.querySelectorAll('.atab').forEach(t=>{
@@ -518,10 +575,11 @@ if(CU.role === 'admin'){
   await renderAdmin();
   await renderDeptTab();
 
-} else if(CU.role === 'limited_admin'){
-  show('av');
-  await buildDeptFilter();
-  await renderMyAdded();
+} else {
+  show('dv');
+  $s('d-title', 'ملاحظات ' + CU.label);
+  await renderDept();
+}
 
   document.querySelectorAll('.atab').forEach(t=>t.style.display='none');
   document.querySelectorAll('.tp').forEach(t=>t.classList.remove('show'));
@@ -753,18 +811,46 @@ async function selDD(d, preloaded){
 }
 // ══ ADD OBS ══════════════════════════════════════════════════
 async function addObs(){
-  const dept=$('n-d').value, short=$('n-sh').value.trim();
-  if(!dept||!short){ toast('يرجى تحديد القسم وعنوان الملاحظة'); return; }
+  const dept = $('n-d').value;
+  const short = $('n-sh').value.trim();
+
+  if(!dept){
+    toast('يرجى اختيار القسم المعني');
+    return;
+  }
+
+  if(!short){
+    toast('يرجى كتابة عنوان الملاحظة');
+    return;
+  }
+
   const {error}=await SB.from('observations').insert({
-    dept, priority:$('n-p').value, source:$('n-s').value,
-    obs_date:$('n-dt').value||new Date().toISOString().split('T')[0],
-    short, full_text:$('n-fu').value.trim()||short, status:'pending', action:'', deadline:null, created_by: CU.id
+    dept,
+    priority:$('n-p').value,
+    source:$('n-s').value,
+    obs_date:$('n-dt').value || new Date().toISOString().split('T')[0],
+    short,
+    full_text:$('n-fu').value.trim() || short,
+    status:'pending',
+    action:'',
+    deadline:null,
+    created_by: CU.id
   });
-  if(error){ toast('خطأ في الإضافة'); return; }
+
+  if(error){
+    console.log('ADD OBS ERROR:', error);
+    toast('خطأ في الإضافة');
+    return;
+  }
+
   ['n-d','n-sh','n-fu'].forEach(id=>$(id).value='');
-  $('n-p').value='high'; $('n-s').value='field'; $('n-dt').valueAsDate=new Date();
+  $('n-p').value='high';
+  $('n-s').value='field';
+  $('n-dt').valueAsDate=new Date();
+
   toast('تمت إضافة الملاحظة ✓');
-  renderAdmin(); renderDeptTab();
+  await renderAdmin();
+  await renderDeptTab();
 }
 
 // ══ CARD ════════════════════════════════════════════════════
@@ -834,7 +920,7 @@ function card(o,isAdmin){
         
       </div>
       <div class="fa">
-        ${isAdmin?`<button class="bdel" onclick="delObs(${o.id},event)">حذف</button>`:'<span></span>'}
+        ${CU.role === 'admin' ? <button class="bdel" onclick="delObs(${o.id},event)">حذف</button> : '<span></span>'}
         <button class="bsv" onclick="saveCard(${o.id})">حفظ التحديث</button>
       </div>
     </div>`:''}
