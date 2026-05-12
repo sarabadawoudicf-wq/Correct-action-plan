@@ -314,8 +314,6 @@ create policy "open_access" on observations
         <button class="atab on" onclick="stab('ov',this)">نظرة عامة</button>
         <button class="atab" onclick="stab('ad',this)">إضافة ملاحظة</button>
         <button class="atab" onclick="stab('dt',this)">تفصيل الأقسام</button>
-        <button class="atab" onclick="stab('st',this)">الإعدادات</button>
-        <button class="atab" onclick="stab('em',this)">إرسال تذكير</button>
       </div>
 
       <!-- OVERVIEW -->
@@ -370,11 +368,11 @@ create policy "open_access" on observations
   <div class="sh"><span class="st" id="dt-title">—</span></div>
   <div class="olist" id="dt-list"></div>
 </div>
-
+      
+ </div>
 </div>
-</div>
 
-<div class="toast" id="toast"></div>
+ <div class="toast" id="toast"></div>
 
 <script>
 // ══ CONSTANTS ═══════════════════════════════════════════════
@@ -1009,11 +1007,14 @@ async function sendAllReminders(){
 // ══ TABS ════════════════════════════════════════════════════
 function stab(name,btn){
   document.querySelectorAll('.atab').forEach(t=>t.classList.remove('on'));
+
   btn.classList.add('on');
-  ['ov','ad','dt','st','em'].forEach(n=>$('tp-'+n).classList.remove('show'));
+
+  ['ov','ad','dt'].forEach(n=>{
+    $('tp-'+n).classList.remove('show');
+  });
+
   $('tp-'+name).classList.add('show');
-  if(name==='st'){ renderSettings(); }
-  if(name==='em'){ loadEJSSettings(); renderEmailDeptList(); }
 }
 </script>
 </body>
