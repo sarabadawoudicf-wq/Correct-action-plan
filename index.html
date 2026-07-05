@@ -1127,15 +1127,27 @@ async function delObs(id,e){
 async function rerender(){
   if(!CU) return;
 
-  if(CU.role==='admin' || CU.role==='limited_admin'){
-    await renderAdmin();
-    await renderDeptTab();
-  }else{
-    await renderDept();
-  }
+  const keepOpen = openId;
 
-  if(openId){
-    await loadActions(openId);
+  if(CU.role === 'admin' || CU.role === 'limited_admin'){
+    await renderAdmin();
+
+    openId = keepOpen;
+
+    if(openId){
+      await loadActions(openId);
+    }
+
+    await renderDeptTab();
+
+    openId = keepOpen;
+
+  } else {
+    await renderDept();
+
+    if(openId){
+      await loadActions(openId);
+    }
   }
 }
 
