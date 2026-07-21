@@ -311,34 +311,61 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 }  
 
 
+  
+.action-panel {
+  width: 100%;
+  margin-top: 24px;
+  margin-bottom: 30px;
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #dfe4ef;
+  border-radius: 18px;
+  box-shadow: 0 4px 14px rgba(31, 51, 92, 0.08);
+  box-sizing: border-box;
+}
+
+.action-panel .fg {
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.action-panel textarea {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  margin-top: 8px;
+  padding: 14px;
+  box-sizing: border-box;
+  border: 1px solid #d6ddec;
+  border-radius: 12px;
+  resize: vertical;
+}
 
 .attachment-field {
-  margin-top: 14px;
-  margin-bottom: 20px;
-  padding: 12px 14px;
-  border: 1px dashed #d7dce8;
-  border-radius: 10px;
-  background: #fafbfe;
+  width: 100%;
+  margin-top: 16px;
 }
 
 .attachment-label {
   display: block;
   margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
 }
 
 .attachment-field input[type="file"] {
   display: block;
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   box-sizing: border-box;
+  border: 1px solid #d6ddec;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.action-panel .fa {
+  margin-top: 20px;
 }
 
 
-.fg.ff {
-  margin-bottom: 18px;
-}  
   
 </style>
 </head>
@@ -1100,6 +1127,8 @@ function card(o,isAdmin){
           <input type="date" id="dl${o.id}" value="${o.deadline || ''}">
         </div>
 
+       <div class="action-panel">
+       
         <div class="fg ff">
           <label>سجل الإجراءات السابقة</label>
           <div id="acts${o.id}"></div>
@@ -1127,6 +1156,9 @@ function card(o,isAdmin){
         ${CU.role === 'admin' ? `<button class="bdel" onclick="delObs(${o.id},event)">حذف</button>` : `<span></span>`}
         <button class="bsv" onclick="saveCard(${o.id})">حفظ التحديث</button>
       </div>
+
+    </div>
+      
     </div>` : ''}
   </div>`;
 }
