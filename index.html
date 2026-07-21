@@ -381,9 +381,8 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 
 /* صندوق الإجراءات يأخذ عرض البطاقة كاملًا */
 .action-panel {
-  grid-column: 1 / -1;
   width: 100%;
-  margin: 24px 0 0;
+  margin-top: 24px;
   padding: 22px;
   background: #ffffff;
   border: 1px solid #dfe4ef;
@@ -1157,7 +1156,8 @@ function card(o,isAdmin){
           <label>الموعد المتوقع للإنجاز</label>
           <input type="date" id="dl${o.id}" value="${o.deadline || ''}">
         </div>
-
+      </div>
+      
        <div class="action-panel">
        
         <div class="fg ff">
