@@ -309,6 +309,36 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
   color:#34456f;
   font-weight:600;
 }  
+
+
+
+.attachment-field {
+  margin-top: 14px;
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border: 1px dashed #d7dce8;
+  border-radius: 10px;
+  background: #fafbfe;
+}
+
+.attachment-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.attachment-field input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+
+.fg.ff {
+  margin-bottom: 18px;
+}  
   
 </style>
 </head>
@@ -1079,12 +1109,16 @@ function card(o,isAdmin){
           <label>إضافة إجراء تصحيحي جديد</label>
           <textarea id="ac${o.id}" placeholder="اكتب الإجراء الجديد هنا..."></textarea>
 
-            <div style="margin-top:10px;">
-              <input
-               type="file"
-               id="attachment${o.id}"
-               accept=".pdf,.jpg,.jpeg,.png"
-               class="form-control">
+        <div class="attachment-field">
+         <label for="attachment${o.id}" class="attachment-label">
+      إرفاق ملف اختياري
+         </label>
+
+         <input
+          type="file"
+          id="attachment${o.id}"
+          accept=".pdf,.jpg,.jpeg,.png"
+          >
           
         </div>
       </div>
