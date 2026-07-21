@@ -366,6 +366,37 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 }
 
 
+/* قائمة الملاحظات */
+.olist {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* كل ملاحظة بطاقة مستقلة */
+.olist > .oc {
+  width: 100%;
+  margin: 0;
+}
+
+/* صندوق الإجراءات يأخذ عرض البطاقة كاملًا */
+.action-panel {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin: 24px 0 0;
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #dfe4ef;
+  border-radius: 18px;
+  box-shadow: 0 4px 14px rgba(31, 51, 92, 0.08);
+  box-sizing: border-box;
+}
+
+
+
+
+
+  
   
 </style>
 </head>
