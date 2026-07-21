@@ -288,6 +288,27 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .titem{background:var(--surf);border:1px solid var(--bdr);border-right:4px solid var(--navy);border-radius:10px;padding:10px 12px;}
 .tmeta{font-size:11px;color:var(--mut);margin-bottom:6px;}
 .ttext{font-size:13px;color:var(--txt);line-height:1.7;white-space:pre-wrap;}
+
+
+.department-reply{
+  border-right-color:#1b2b52;
+  background:#f5f7fd;
+}
+
+.management-reply{
+  border-right-color:#c8962a;
+  background:#fff9e9;
+}
+
+.management-reply .tmeta{
+  color:#9a6800;
+  font-weight:600;
+}
+
+.department-reply .tmeta{
+  color:#34456f;
+  font-weight:600;
+}  
   
 </style>
 </head>
@@ -988,11 +1009,27 @@ async function loadActions(id){
   box.innerHTML='<div class="timeline">'+data.map(a=>{
     const dt=new Date(a.created_at).toLocaleString('ar-SA');
     const st=S_LBL[a.status] || a.status;
+    
+//new
+   const isManagement =
+  a.author_role === 'admin' ||
+  a.author_role === 'limited_admin';
 
-    return '<div class="titem">'+
-      '<div class="tmeta">'+dt+' | '+st+'</div>'+
-      '<div class="ttext">'+a.action_text+'</div>'+
-    '</div>';
+const itemClass = isManagement
+  ? 'titem management-reply'
+  : 'titem department-reply';
+
+const authorName = a.author_label ||
+  (isManagement ? 'إدارة الجودة' : 'القسم');
+
+return '<div class="' + itemClass + '">' +
+  '<div class="tmeta">' +
+    authorName + ' — ' + dt + ' | ' + st +
+  '</div>' +
+  '<div class="ttext">' + a.action_text + '</div>' +
+'</div>';
+
+    //end new
   }).join('')+'</div>';
 }
 
@@ -1076,7 +1113,10 @@ async function saveCard(id){
     .insert({
       observation_id:id,
       status:newStatus,
-      action_text:newAction
+      action_text:newAction,
+      created_by: CU.id,
+      author_role: CU.role,
+      author_label: CU.label
     });
 
   if(insertError){
