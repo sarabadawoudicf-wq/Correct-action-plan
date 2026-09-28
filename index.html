@@ -107,21 +107,6 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
   box-shadow:var(--sh);
 }
 
-#dept-filter-chips{
-  display:flex;
-  gap:8px;
-  flex-wrap:nowrap;
-  overflow-x:auto;
-  padding-bottom:4px;
-  background:transparent;
-  border: none;
-}
-
-#dept-filter-chips .chip{
-  white-space:nowrap;
-  flex:0 0 auto;
-}
-
 
   
 .st{font-size:15px;font-weight:600;color:var(--navy);}
@@ -130,24 +115,6 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
   display:flex;
   gap:8px;
   flex-wrap:wrap;
-}
-
-#dept-filter-chips{
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  background:#f8faff;
-  border:1px solid var(--bdr);
-  border-radius:12px;
-  display:flex;
-  gap:8px;
-  flex-wrap:nowrap;
-  overflow-x:auto;
-}
-
-#dept-filter-chips .chip{
-  white-space:nowrap;
-  flex:0 0 auto;
 }
 
 .chip{font-size:11.5px;padding:4px 13px;border-radius:99px;border:1px solid var(--bdr);background:var(--w);color:var(--mut);cursor:pointer;font-family:inherit;transition:all .14s;}
@@ -265,23 +232,28 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
   .wrap{padding:14px;}.nav{padding:0 14px;}.lc{padding:30px 18px;}
 }
 
-.dept-filter-clean{
-  width:100%;
-  margin:12px 0 18px;
-  padding:0;
-  background:transparent;
-  border:none;
-  box-shadow:none;
-  display:flex;
-  gap:8px;
-  flex-wrap:nowrap;
-  overflow-x:auto;
-}
-
-.dept-filter-clean .chip{
-  white-space:nowrap;
-  flex:0 0 auto;
-}
+/* ── PROJECT CIRCLES ─────────────────────────────────────── */
+.proj-circles{display:flex;flex-wrap:wrap;gap:18px 14px;margin:4px 0 22px;justify-content:flex-start;}
+.pcirc{display:flex;flex-direction:column;align-items:center;gap:7px;width:92px;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;}
+.pring{position:relative;width:72px;height:72px;border-radius:50%;background:var(--w);box-shadow:var(--sh);transition:transform .16s,box-shadow .16s;}
+.pring svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.pring .trk{fill:none;stroke:var(--bg);stroke-width:5;}
+.pring .val{fill:none;stroke:var(--grn);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .5s;}
+.pnum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;}
+.pnum b{font-size:17px;font-weight:600;color:var(--navy);}
+.pnum small{font-size:9.5px;color:var(--mut);}
+.plbl{font-size:11.5px;color:var(--mut);text-align:center;line-height:1.35;max-width:92px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.pcirc:hover .pring{transform:translateY(-2px);box-shadow:var(--shm);}
+.pcirc.on .pring{background:var(--navy);box-shadow:0 0 0 3px var(--w),0 0 0 5px var(--navy);}
+.pcirc.on .pring .trk{stroke:rgba(255,255,255,.15);}
+.pcirc.on .pring .val{stroke:var(--gold2);}
+.pcirc.on .pnum b{color:#fff;}
+.pcirc.on .pnum small{color:rgba(255,255,255,.7);}
+.pcirc.on .plbl{color:var(--navy);font-weight:600;}
+.pcirc.all .pring{border:1.5px dashed var(--bdr);}
+.pcirc.all.on .pring{border-color:transparent;}
+.pcirc:focus-visible{outline:none;}
+.pcirc:focus-visible .pring{box-shadow:0 0 0 3px var(--gold2);}
 
   
 .timeline{margin-top:8px;display:flex;flex-direction:column;gap:10px;}
@@ -525,6 +497,7 @@ create policy "open_access" on observations
           <div class="phx"><span class="plx">نسبة الإنجاز الكلية</span><span class="pp" id="a-pct">—</span></div>
           <div class="pt"><div class="pf" id="a-bar" style="width:0%"></div></div>
         </div>
+        <div class="proj-circles" id="dept-filter-chips"></div>
         <div class="sh">
           <span class="st">جميع الملاحظات</span>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -537,7 +510,6 @@ create policy "open_access" on observations
             <button class="bxl" onclick="exportXL(true)">⬇️ Excel</button>
           </div>
         </div>
-        <div class="chips dept-filter-clean" id="dept-filter-chips"></div>
         <div class="olist" id="a-list"></div>
       </div>
 
@@ -600,10 +572,11 @@ const S_CLS={pending:'sp0',progress:'sp1',done:'sp2'};
 const P_CLS={high:'ph2',mid:'pm',low:'plo'};
 const P_LBL={high:'عالية',mid:'متوسطة',low:'منخفضة'};
 
-let SB=null, CU=null, USERS=[], DEPTS=[], aFil='all', dFil='all', selDept='', openId=null;
+let SB=null, CU=null, USERS=[], DEPTS=[], aFil='all', aProj='all', dFil='all', selDept='', openId=null;
 
 const $=id=>document.getElementById(id);
 const $s=(id,v)=>{const e=$(id); if(e)e.textContent=v;};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const show=id=>$(id).style.display=id==='login-screen'?'flex':'block';
 const hide=id=>$(id).style.display='none';
 
@@ -693,6 +666,7 @@ async function restoreSession(){
 
 async function openAppByRole(){
   aFil = 'all';
+  aProj = 'all';
   dFil = 'all';
   selDept = '';
   openId = null;
@@ -782,6 +756,7 @@ async function logout(){
   CU=null;
   openId=null;
   aFil='all';
+  aProj='all';
   dFil='all';
   selDept='';
 
@@ -862,23 +837,25 @@ async function renderAdmin(){
 
   if(!all) return;
 
-  const don=all.filter(o=>o.status==='done').length;
-  const prg=all.filter(o=>o.status==='progress').length;
-  const pnd=all.filter(o=>o.status==='pending').length;
-  const pct=all.length?Math.round(don/all.length*100):0;
+  if(aProj!=='all' && !DEPTS.some(d=>d.dept===aProj)) aProj='all';
+  renderProjCircles(all);
 
-  $s('a-tot',all.length);
+  // Stats reflect the selected project
+  const scope=aProj==='all'?all:all.filter(o=>o.dept===aProj);
+  const don=scope.filter(o=>o.status==='done').length;
+  const prg=scope.filter(o=>o.status==='progress').length;
+  const pnd=scope.filter(o=>o.status==='pending').length;
+  const pct=scope.length?Math.round(don/scope.length*100):0;
+
+  $s('a-tot',scope.length);
   $s('a-pnd',pnd);
   $s('a-prg',prg);
   $s('a-don',don);
   $s('a-pct',pct+'%');
   $('a-bar').style.width=pct+'%';
 
-  let filt=all;
-  const deptKeys=DEPTS.map(d=>d.dept);
-
-  if(deptKeys.includes(aFil)) filt=all.filter(o=>o.dept===aFil);
-  else if(['pending','progress','done'].includes(aFil)) filt=all.filter(o=>o.status===aFil);
+  let filt=scope;
+  if(['pending','progress','done'].includes(aFil)) filt=scope.filter(o=>o.status===aFil);
 
   $('a-list').innerHTML=filt.length
     ? filt.map(o=>card(o,true)).join('')
@@ -889,14 +866,42 @@ function af(el,f){
   aFil=f;
   openId=null;
   chOn('a-chips',el);
-  chOn('dept-filter-chips',el);
   renderAdmin();
 }
 
-async function buildDeptFilter(){
-  const c=$('dept-filter-chips');
-  if(c) c.innerHTML='';
+function pf(p){
+  aProj=aProj===p?'all':p;
+  openId=null;
+  renderAdmin();
+}
 
+function renderProjCircles(all){
+  const c=$('dept-filter-chips');
+  if(!c) return;
+
+  const C=2*Math.PI*33;
+  const circ=(key,label,obs,extra)=>{
+    const don=obs.filter(o=>o.status==='done').length;
+    const pct=obs.length?don/obs.length:0;
+    const on=aProj===key;
+    return `<button class="pcirc ${extra||''} ${on?'on':''}" data-p="${esc(key)}" aria-pressed="${on}"
+      title="${esc(label)} — ${obs.length} ملاحظة، ${Math.round(pct*100)}% مكتملة">
+      <span class="pring">
+        <svg viewBox="0 0 72 72"><circle class="trk" cx="36" cy="36" r="33"/>
+        <circle class="val" cx="36" cy="36" r="33" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}"/></svg>
+        <span class="pnum"><b>${obs.length}</b><small>${Math.round(pct*100)}%</small></span>
+      </span>
+      <span class="plbl">${esc(label)}</span>
+    </button>`;
+  };
+
+  c.innerHTML=circ('all','جميع المشاريع',all,'all')+
+    DEPTS.map(d=>circ(d.dept,d.label,all.filter(o=>o.dept===d.dept))).join('');
+
+  c.querySelectorAll('.pcirc').forEach(b=>b.onclick=()=>pf(b.dataset.p));
+}
+
+async function buildDeptFilter(){
   const {data,error}=await SB
     .from('departments')
     .select('*')
@@ -1309,6 +1314,7 @@ async function exportXL(all){
   let q=SB.from('observations').select('*').order('added',{ascending:false});
 
   if(!all) q=q.eq('dept',CU.dept);
+  else if(aProj!=='all') q=q.eq('dept',aProj);
 
   const {data}=await q;
 
@@ -1334,7 +1340,8 @@ async function exportXL(all){
   const wb=XLSX.utils.book_new();
 
   XLSX.utils.book_append_sheet(wb,ws,'الخطة التصحيحية');
-  XLSX.writeFile(wb,`خطة_تصحيحية_${new Date().toISOString().split('T')[0]}.xlsx`);
+  const proj=all && aProj!=='all' ? '_'+getDeptName(aProj).replace(/[\\/:*?"<>|\s]+/g,'_') : '';
+  XLSX.writeFile(wb,`خطة_تصحيحية${proj}_${new Date().toISOString().split('T')[0]}.xlsx`);
 
   toast('تم تصدير Excel ✓');
 }
