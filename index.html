@@ -74,13 +74,17 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 
 /* ── STATS ───────────────────────────────────────────────── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px;}
-.sc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;padding:17px 19px;box-shadow:var(--sh);position:relative;overflow:hidden;}
-.sc::after{content:'';position:absolute;top:0;right:0;width:4px;height:100%;}
-.sc.tot::after{background:var(--navy3);}.sc.red::after{background:var(--red);}
-.sc.amb::after{background:var(--amb);}.sc.grn::after{background:var(--grn);}
-.sl{font-size:11.5px;color:var(--mut);margin-bottom:6px;}
-.sv{font-size:26px;font-weight:600;}
-.sc.red .sv{color:var(--red);}.sc.amb .sv{color:var(--amb);}.sc.grn .sv{color:var(--grn);}
+.sc{border-radius:16px;padding:18px 20px;color:#fff;position:relative;overflow:hidden;box-shadow:0 10px 24px -12px var(--scs);transition:transform .18s,box-shadow .18s;}
+.sc:hover{transform:translateY(-2px);box-shadow:0 14px 28px -12px var(--scs);}
+.sc::before,.sc::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none;}
+.sc::before{width:120px;height:120px;top:-48px;left:-36px;}
+.sc::after{width:70px;height:70px;bottom:-34px;left:34px;background:rgba(255,255,255,.08);}
+.sc.tot{background:linear-gradient(135deg,#3a5299,#1b2b52);--scs:rgba(27,43,82,.7);}
+.sc.red{background:linear-gradient(135deg,#e35d5d,#a82626);--scs:rgba(168,38,38,.6);}
+.sc.amb{background:linear-gradient(135deg,#e39a1e,#a8620a);--scs:rgba(168,98,10,.6);}
+.sc.grn{background:linear-gradient(135deg,#2fae6e,#136a3d);--scs:rgba(19,106,61,.6);}
+.sl{font-size:12px;color:rgba(255,255,255,.85);margin-bottom:6px;position:relative;}
+.sv{font-size:28px;font-weight:600;position:relative;}
 .pw{margin-bottom:22px;}
 .phx{display:flex;justify-content:space-between;margin-bottom:5px;}
 .plx{font-size:12.5px;color:var(--mut);}
@@ -123,11 +127,14 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .chip.on.r{background:var(--red);border-color:var(--red);}
 .chip.on.a{background:var(--amb);border-color:var(--amb);}
 .chip.on.g{background:var(--grn);border-color:var(--grn);}
-.bxl{padding:6px 14px;border-radius:8px;border:1px solid var(--bdr);background:var(--w);color:var(--txt);font-family:inherit;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .14s;}
-.bxl:hover{background:var(--surf);}
+.bxl{padding:6px 14px;border-radius:8px;border:1px solid #b9dcc8;background:var(--w);color:#107c41;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .14s,border-color .14s;}
+.bxl::before{content:'';width:18px;height:18px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3' width='14' height='18' rx='2' fill='%2321a366'/%3E%3Cpath d='M14 3v18M7 9h14M7 15h14' stroke='%23fff' stroke-opacity='.55'/%3E%3Crect x='3' y='6.5' width='11' height='11' rx='1.6' fill='%23107c41'/%3E%3Cpath d='M6.2 9.4l4.6 5.2M10.8 9.4l-4.6 5.2' stroke='%23fff' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;}
+.bxl:hover{background:#eaf6ef;border-color:#107c41;}
 
 /* ── OBS CARDS ───────────────────────────────────────────── */
-.olist{display:flex;flex-direction:column;gap:0px;}
+.olist{display:flex;flex-direction:column;gap:14px;}
+.olist>.oc{width:100%;margin:0 0 16px;}
+.olist>.oc:last-child{margin-bottom:0;}
 .oc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;overflow:hidden;box-shadow:var(--sh);transition:box-shadow .18s;}
 .oc:hover{box-shadow:var(--shm);}
 .oh{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none;}
@@ -180,8 +187,7 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 
 /* ── DEPT CARDS ───────────────────────────────────────────── */
 .dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:13px;margin-bottom:24px;}
-.dc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;padding:17px;box-shadow:var(--sh);cursor:pointer;transition:box-shadow .18s,border-color .18s;}
-.dc:hover{box-shadow:var(--shm);}
+.dc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;padding:17px;box-shadow:var(--sh);}
 .dc.sel{border-color:var(--navy);}
 .dn{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:9px;}
 .dbw{height:5px;background:var(--bg);border-radius:99px;margin:5px 0 10px;overflow:hidden;}
@@ -233,7 +239,7 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 }
 
 /* ── PROJECT CIRCLES ─────────────────────────────────────── */
-.proj-circles{display:flex;flex-wrap:wrap;gap:18px 14px;margin:4px 0 22px;justify-content:flex-start;}
+.proj-circles{display:flex;flex-wrap:wrap;gap:18px 14px;margin:4px 0 22px;justify-content:center;}
 .pcirc{display:flex;flex-direction:column;align-items:center;gap:7px;width:92px;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;}
 .pring{position:relative;width:72px;height:72px;border-radius:50%;background:var(--w);box-shadow:var(--sh);transition:transform .16s,box-shadow .16s;}
 .pring svg{position:absolute;inset:0;transform:rotate(-90deg);}
@@ -336,48 +342,6 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .action-panel .fa {
   margin-top: 20px;
 }
-
-
-/* قائمة الملاحظات */
-.olist {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* كل ملاحظة بطاقة مستقلة */
-.olist > .oc {
-  width: 100%;
-  margin: 0;
-}
-
-/* صندوق الإجراءات يأخذ عرض البطاقة كاملًا */
-.action-panel {
-  width: 100%;
-  margin-top: 24px;
-  padding: 22px;
-  background: #ffffff;
-  border: 1px solid #dfe4ef;
-  border-radius: 18px;
-  box-shadow: 0 4px 14px rgba(31, 51, 92, 0.08);
-  box-sizing: border-box;
-}
-
-/* مسافة ثابتة بين كل ملاحظة والتي تليها */
-.olist > .oc {
-  margin-bottom: 16px;
-}
-
-/* آخر ملاحظة لا تحتاج مسافة إضافية */
-.olist > .oc:last-child {
-  margin-bottom: 0;
-}  
-
-
-
-
-  
-  
 </style>
 </head>
 <body>
@@ -420,8 +384,8 @@ create policy "open_access" on observations
     <div class="lic">🔍</div>
     <div class="lit">نظام متابعة الخطة التصحيحية</div>
     <div class="lis">إدارة الأداء والجودة<br>أدخل بيانات الدخول للمتابعة</div>
-    <label class="ll">اسم المستخدم</label>
-    <input class="li" id="li-u" type="text" placeholder="اسم المستخدم" autocomplete="username">
+    <label class="ll">البريد الإلكتروني</label>
+    <input class="li" id="li-u" type="email" placeholder="البريد الإلكتروني" autocomplete="username">
     <label class="ll">كلمة المرور</label>
     <input class="li" id="li-p" type="password" placeholder="كلمة المرور" autocomplete="current-password">
     <button class="lb" onclick="doLogin()">دخول إلى النظام</button>
@@ -470,7 +434,7 @@ create policy "open_access" on observations
             <button class="chip a" onclick="df(this,'progress')">قيد المعالجة</button>
             <button class="chip g" onclick="df(this,'done')">مكتملة</button>
           </div>
-          <button class="bxl" onclick="exportXL(false)">⬇️ Excel</button>
+          <button class="bxl" onclick="exportXL(false)">تصدير Excel</button>
         </div>
       </div>
       <div class="olist" id="d-list"></div>
@@ -493,11 +457,11 @@ create policy "open_access" on observations
           <div class="sc amb"><div class="sl">قيد المعالجة</div><div class="sv" id="a-prg">—</div></div>
           <div class="sc grn"><div class="sl">مكتملة</div><div class="sv" id="a-don">—</div></div>
         </div>
+        <div class="proj-circles" id="dept-filter-chips"></div>
         <div class="pw">
-          <div class="phx"><span class="plx">نسبة الإنجاز الكلية</span><span class="pp" id="a-pct">—</span></div>
+          <div class="phx"><span class="plx" id="a-pct-lbl">نسبة الإنجاز الكلية</span><span class="pp" id="a-pct">—</span></div>
           <div class="pt"><div class="pf" id="a-bar" style="width:0%"></div></div>
         </div>
-        <div class="proj-circles" id="dept-filter-chips"></div>
         <div class="sh">
           <span class="st">جميع الملاحظات</span>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -507,7 +471,7 @@ create policy "open_access" on observations
               <button class="chip a" onclick="af(this,'progress')">قيد المعالجة</button>
               <button class="chip g" onclick="af(this,'done')">مكتملة</button>
             </div>
-            <button class="bxl" onclick="exportXL(true)">⬇️ Excel</button>
+            <button class="bxl" onclick="exportXL(true)">تصدير Excel</button>
           </div>
         </div>
         <div class="olist" id="a-list"></div>
@@ -572,7 +536,7 @@ const S_CLS={pending:'sp0',progress:'sp1',done:'sp2'};
 const P_CLS={high:'ph2',mid:'pm',low:'plo'};
 const P_LBL={high:'عالية',mid:'متوسطة',low:'منخفضة'};
 
-let SB=null, CU=null, USERS=[], DEPTS=[], aFil='all', aProj='all', dFil='all', selDept='', openId=null;
+let SB=null, CU=null, USERS=[], DEPTS=[], OBS=[], aFil='all', aProj='all', dFil='all', selDept='', openId=null, openScope='';
 
 const $=id=>document.getElementById(id);
 const $s=(id,v)=>{const e=$(id); if(e)e.textContent=v;};
@@ -629,28 +593,16 @@ function resetSB(){
   show('setup');
 }
 
-async function restoreSession(){
-  const ok=await initSB(SUPABASE_URL,SUPABASE_KEY);
-  if(!ok){show('login-screen');return;}
+const isAdmin=()=>CU && (CU.role==='admin' || CU.role==='limited_admin');
 
-  const {data}=await SB.auth.getSession();
-
-  if(!data.session){
-    show('login-screen');
-    return;
-  }
-
-  const user=data.session.user;
+async function loadProfile(user){
   const {data:profile,error}=await SB
     .from('user_profiles')
     .select('*')
     .eq('id',user.id)
     .single();
 
-  if(error || !profile){
-    show('login-screen');
-    return;
-  }
+  if(error || !profile) return false;
 
   CU={
     id:user.id,
@@ -660,6 +612,19 @@ async function restoreSession(){
     dept:profile.dept || '',
     email:user.email
   };
+  return true;
+}
+
+async function restoreSession(){
+  const ok=await initSB(SUPABASE_URL,SUPABASE_KEY);
+  if(!ok){show('login-screen');return;}
+
+  const {data}=await SB.auth.getSession();
+
+  if(!data.session || !await loadProfile(data.session.user)){
+    show('login-screen');
+    return;
+  }
 
   await openAppByRole();
 }
@@ -670,14 +635,16 @@ async function openAppByRole(){
   dFil = 'all';
   selDept = '';
   openId = null;
- 
+  openScope = '';
+  OBS = [];
+
   hide('login-screen');
   show('app');
 
   $s('nav-u',CU.label);
   $s('nav-sub',CU.role==='dept'?'واجهة القسم':'لوحة المدير');
 
-  if(CU.role==='admin' || CU.role==='limited_admin'){
+  if(isAdmin()){
     show('av');
     hide('dv');
 
@@ -692,17 +659,17 @@ async function openAppByRole(){
     if(ovTab) ovTab.classList.add('on');
     $('tp-ov').classList.add('show');
 
+    $('a-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
     await buildDeptFilter();
-    await renderAdmin();
-    await renderDeptTab();
 
   }else{
     show('dv');
     hide('av');
     $s('d-title','ملاحظات '+CU.label);
-    await renderDept();
+    $('d-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
   }
 
+  await rerender();
   checkReminder();
 }
 
@@ -725,27 +692,10 @@ async function doLogin(){
     return;
   }
 
-  const userId=data.user.id;
-
-  const {data:profile,error:profileError}=await SB
-    .from('user_profiles')
-    .select('*')
-    .eq('id',userId)
-    .single();
-
-  if(profileError || !profile){
+  if(!await loadProfile(data.user)){
     $('li-e').textContent='هذا المستخدم غير مربوط بالنظام';
     return;
   }
-
-  CU={
-    id:userId,
-    key:email,
-    role:profile.role,
-    label:profile.label,
-    dept:profile.dept || '',
-    email:email
-  };
 
   $('li-e').textContent='';
   await openAppByRole();
@@ -754,7 +704,9 @@ async function doLogin(){
 async function logout(){
   await SB.auth.signOut();
   CU=null;
+  OBS=[];
   openId=null;
+  openScope='';
   aFil='all';
   aProj='all';
   dFil='all';
@@ -771,53 +723,91 @@ async function logout(){
   show('login-screen');
 }
 
-async function checkReminder(){
-  if(!SB || !CU) return;
+function checkReminder(){
+  if(!CU) return;
 
-  const cutoff=new Date(Date.now()-15*24*60*60*1000).toISOString();
-  let q=SB.from('observations').select('id').neq('status','done').lt('added',cutoff);
+  const cutoff=Date.now()-15*24*60*60*1000;
+  const late=OBS.filter(o=>o.status!=='done' && o.added && new Date(o.added).getTime()<cutoff).length;
 
-  if(CU.role==='dept') q=q.eq('dept',CU.dept);
-
-  const {data}=await q;
-
-  if(data && data.length){
-    $('rem-txt').innerHTML= `<strong>تذكير:</strong> يوجد <strong>${data.length}</strong> ملاحظة تجاوزت 15 يوماً دون إغلاق.`;
+  if(late){
+    $('rem-txt').innerHTML= `<strong>تذكير:</strong> يوجد <strong>${late}</strong> ملاحظة تجاوزت 15 يوماً دون إغلاق.`;
     $('rem').style.display='flex';
   }
 }
 
+// ══ DATA ════════════════════════════════════════════════════
+// Observations are fetched once into OBS; filters, tabs and opening
+// cards re-render from it. Only saves/adds/deletes fetch again (rerender).
 
+async function loadObs(){
+  let q=SB.from('observations').select('*').order('added',{ascending:false});
+  if(!isAdmin()) q=q.eq('dept',CU.dept);
 
-  
-async function renderDept(){
-  $('d-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
+  const {data,error}=await q;
 
-  const {data:all}=await SB
-    .from('observations')
-    .select('*')
-    .eq('dept',CU.dept)
-    .order('added',{ascending:false});
+  if(error){
+    console.log('OBS ERROR:',error);
+    toast('خطأ في تحميل الملاحظات');
+    return false;
+  }
 
-  if(!all) return;
+  OBS=data || [];
+  return true;
+}
 
-  const don=all.filter(o=>o.status==='done').length;
-  const prg=all.filter(o=>o.status==='progress').length;
-  const pnd=all.filter(o=>o.status==='pending').length;
-  const pct=all.length?Math.round(don/all.length*100):0;
+function paint(){
+  if(!CU) return;
 
-  $s('d-tot',all.length);
-  $s('d-pnd',pnd);
-  $s('d-prg',prg);
-  $s('d-don',don);
-  $s('d-pct',pct+'%');
-  $('d-bar').style.width=pct+'%';
+  if(isAdmin()){
+    renderAdmin();
+    renderDeptTab();
+  }else{
+    renderDept();
+  }
 
-  const f=dFil==='all'?all:all.filter(o=>o.status===dFil);
+  if(openId) loadActions(openId);
+}
 
-  $('d-list').innerHTML=f.length
-    ? f.map(o=>card(o,false)).join('')
-    : '<div class="empty"><div class="ei">✅</div>لا توجد ملاحظات بهذا الفلتر</div>';
+async function rerender(){
+  if(!CU) return;
+  if(await loadObs()) paint();
+}
+
+function counts(obs){
+  const n=s=>obs.filter(o=>o.status===s).length;
+  const don=n('done');
+  return {
+    tot:obs.length,
+    don,
+    prg:n('progress'),
+    pnd:n('pending'),
+    pct:obs.length?Math.round(don/obs.length*100):0
+  };
+}
+
+function setStats(p,obs){
+  const c=counts(obs);
+  $s(p+'-tot',c.tot);
+  $s(p+'-pnd',c.pnd);
+  $s(p+'-prg',c.prg);
+  $s(p+'-don',c.don);
+  $s(p+'-pct',c.pct+'%');
+  $(p+'-bar').style.width=c.pct+'%';
+}
+
+function listHTML(obs,scope,isAdminCard,emptyIcon,emptyMsg){
+  return obs.length
+    ? obs.map(o=>card(o,isAdminCard,scope)).join('')
+    : `<div class="empty"><div class="ei">${emptyIcon}</div>${emptyMsg}</div>`;
+}
+
+// ══ DEPT VIEW ═══════════════════════════════════════════════
+
+function renderDept(){
+  setStats('d',OBS);
+
+  const f=dFil==='all'?OBS:OBS.filter(o=>o.status===dFil);
+  $('d-list').innerHTML=listHTML(f,'d',false,'✅','لا توجد ملاحظات بهذا الفلتر');
 }
 
 function df(el,f){
@@ -827,39 +817,22 @@ function df(el,f){
   renderDept();
 }
 
-async function renderAdmin(){
-  $('a-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
+// ══ ADMIN OVERVIEW ══════════════════════════════════════════
 
-  const {data:all}=await SB
-    .from('observations')
-    .select('*')
-    .order('added',{ascending:false});
-
-  if(!all) return;
-
+function renderAdmin(){
   if(aProj!=='all' && !DEPTS.some(d=>d.dept===aProj)) aProj='all';
-  renderProjCircles(all);
+  renderProjCircles(OBS);
 
   // Stats reflect the selected project
-  const scope=aProj==='all'?all:all.filter(o=>o.dept===aProj);
-  const don=scope.filter(o=>o.status==='done').length;
-  const prg=scope.filter(o=>o.status==='progress').length;
-  const pnd=scope.filter(o=>o.status==='pending').length;
-  const pct=scope.length?Math.round(don/scope.length*100):0;
+  const scope=aProj==='all'?OBS:OBS.filter(o=>o.dept===aProj);
+  setStats('a',scope);
+  $s('a-pct-lbl',aProj==='all'?'نسبة الإنجاز الكلية':'نسبة إنجاز '+getDeptName(aProj));
 
-  $s('a-tot',scope.length);
-  $s('a-pnd',pnd);
-  $s('a-prg',prg);
-  $s('a-don',don);
-  $s('a-pct',pct+'%');
-  $('a-bar').style.width=pct+'%';
+  const filt=['pending','progress','done'].includes(aFil)
+    ? scope.filter(o=>o.status===aFil)
+    : scope;
 
-  let filt=scope;
-  if(['pending','progress','done'].includes(aFil)) filt=scope.filter(o=>o.status===aFil);
-
-  $('a-list').innerHTML=filt.length
-    ? filt.map(o=>card(o,true)).join('')
-    : '<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات</div>';
+  $('a-list').innerHTML=listHTML(filt,'a',true,'📋','لا توجد ملاحظات');
 }
 
 function af(el,f){
@@ -881,15 +854,14 @@ function renderProjCircles(all){
 
   const C=2*Math.PI*33;
   const circ=(key,label,obs,extra)=>{
-    const don=obs.filter(o=>o.status==='done').length;
-    const pct=obs.length?don/obs.length:0;
+    const {tot,pct}=counts(obs);
     const on=aProj===key;
     return `<button class="pcirc ${extra||''} ${on?'on':''}" data-p="${esc(key)}" aria-pressed="${on}"
-      title="${esc(label)} — ${obs.length} ملاحظة، ${Math.round(pct*100)}% مكتملة">
+      title="${esc(label)} — ${tot} ملاحظة، ${pct}% مكتملة">
       <span class="pring">
         <svg viewBox="0 0 72 72"><circle class="trk" cx="36" cy="36" r="33"/>
-        <circle class="val" cx="36" cy="36" r="33" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}"/></svg>
-        <span class="pnum"><b>${obs.length}</b><small>${Math.round(pct*100)}%</small></span>
+        <circle class="val" cx="36" cy="36" r="33" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct/100)}"/></svg>
+        <span class="pnum"><b>${tot}</b><small>${pct}%</small></span>
       </span>
       <span class="plbl">${esc(label)}</span>
     </button>`;
@@ -914,15 +886,6 @@ async function buildDeptFilter(){
 
   DEPTS=data;
 
-  data.forEach(d=>{
-    if(!c) return;
-    const b=document.createElement('button');
-    b.className='chip';
-    b.textContent=d.label;
-    b.onclick=()=>af(b,d.dept);
-    c.appendChild(b);
-  });
-
   const sel=$('n-d');
   sel.innerHTML='<option value="">— اختر —</option>';
 
@@ -934,58 +897,33 @@ async function buildDeptFilter(){
   });
 }
 
-async function changeDeptDetail(value){
+// ══ ADMIN DEPT DETAIL ═══════════════════════════════════════
+
+function changeDeptDetail(value){
   selDept = value;
   openId = null;
-  await renderDeptTab();
+  renderDeptTab();
 }
-  
-async function renderDeptTab(){
-  const {data:depts,error:deptErr}=await SB
-    .from('departments')
-    .select('dept,label')
-    .order('label',{ascending:true});
 
-  if(deptErr){
-    console.log('DEPT TAB ERROR:',deptErr);
-    $('dept-grid').innerHTML='<div class="empty">خطأ في تحميل الأقسام</div>';
-    return;
-  }
-
-  DEPTS=depts || [];
-
-  const {data:all,error:obsErr}=await SB
-    .from('observations')
-    .select('*');
-
-  if(obsErr){
-    console.log('OBS ERROR:',obsErr);
-    $('dt-list').innerHTML='<div class="empty">خطأ في تحميل الملاحظات</div>';
-    return;
-  }
-
-  if(!depts || !depts.length){
+function renderDeptTab(){
+  if(!DEPTS.length){
     $('dept-grid').innerHTML='<div class="empty">لا توجد أقسام مضافة</div>';
     $('dt-title').textContent='—';
     $('dt-list').innerHTML='';
     return;
   }
 
-  if(!selDept) selDept=depts[0].dept;
+  if(!DEPTS.some(d=>d.dept===selDept)) selDept=DEPTS[0].dept;
 
-  $('dt-select').innerHTML = depts.map(d =>
-  `<option value="${d.dept}" ${d.dept===selDept?'selected':''}>${d.label}</option>`
-).join('');
+  $('dt-select').innerHTML=DEPTS.map(d=>
+    `<option value="${esc(d.dept)}" ${d.dept===selDept?'selected':''}>${esc(d.label)}</option>`
+  ).join('');
 
-  $('dept-grid').innerHTML=depts.filter(d=>d.dept===selDept).map(d=>{
-    const obs=(all||[]).filter(o=>o.dept===d.dept);
-    const don=obs.filter(o=>o.status==='done').length;
-    const prg=obs.filter(o=>o.status==='progress').length;
-    const pnd=obs.filter(o=>o.status==='pending').length;
-    const pct=obs.length?Math.round(don/obs.length*100):0;
+  const obs=OBS.filter(o=>o.dept===selDept);
+  const {tot,don,prg,pnd,pct}=counts(obs);
 
-    return `<div class="dc${d.dept===selDept?' sel':''}" onclick="selDD('${d.dept}')">
-      <div class="dn">${d.label}</div>
+  $('dept-grid').innerHTML=`<div class="dc sel">
+      <div class="dn">${esc(getDeptName(selDept))}</div>
       <div style="display:flex;justify-content:space-between">
         <span style="font-size:11px;color:var(--mut)">الإنجاز</span>
         <span style="font-size:12px;font-weight:600;color:var(--navy)">${pct}%</span>
@@ -995,50 +933,12 @@ async function renderDeptTab(){
         <div class="dm"><div class="dmv r">${pnd}</div><div class="dml">معلق</div></div>
         <div class="dm"><div class="dmv a">${prg}</div><div class="dml">جارٍ</div></div>
         <div class="dm"><div class="dmv g">${don}</div><div class="dml">منجز</div></div>
-        <div class="dm"><div class="dmv">${obs.length}</div><div class="dml">إجمالي</div></div>
+        <div class="dm"><div class="dmv">${tot}</div><div class="dml">إجمالي</div></div>
       </div>
     </div>`;
-  }).join('');
 
-  await selDD(selDept,all);
-}
-
-async function selDD(d,preloaded){
-  selDept=d;
-  openId=null;
-
-  document.querySelectorAll('.dc').forEach(c=>c.classList.remove('sel'));
-  document.querySelectorAll('.dc').forEach(c=>{
-    if(c.getAttribute('onclick') && c.getAttribute('onclick').includes(d)){
-      c.classList.add('sel');
-    }
-  });
-
-  $s('dt-title','ملاحظات '+getDeptName(d));
-
-  let obs;
-
-  if(preloaded){
-    obs=preloaded.filter(o=>o.dept===d);
-  }else{
-    const {data,error}=await SB
-      .from('observations')
-      .select('*')
-      .eq('dept',d)
-      .order('added',{ascending:false});
-
-    if(error){
-      console.log('SEL DEPT ERROR:',error);
-      $('dt-list').innerHTML='<div class="empty">خطأ في تحميل ملاحظات القسم</div>';
-      return;
-    }
-
-    obs=data || [];
-  }
-
-  $('dt-list').innerHTML=obs.length
-    ? obs.map(o=>card(o,true)).join('')
-    : '<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات لهذا القسم</div>';
+  $s('dt-title','ملاحظات '+getDeptName(selDept));
+  $('dt-list').innerHTML=listHTML(obs,'dt',true,'📋','لا توجد ملاحظات لهذا القسم');
 }
 
 async function addObs(){
@@ -1080,9 +980,10 @@ async function addObs(){
   $('n-dt').valueAsDate=new Date();
 
   toast('تمت إضافة الملاحظة ✓');
-  await renderAdmin();
-  await renderDeptTab();
+  await rerender();
 }
+
+// ══ CARDS & ACTIONS ═════════════════════════════════════════
 
 async function loadActions(id){
   const box=$('acts'+id);
@@ -1134,13 +1035,15 @@ return '<div class="' + itemClass + '">' +
   }).join('')+'</div>';
 }
 
-function card(o,isAdmin){
-  const isOpen=openId===o.id;
+// scope = which list the card is in ('a' overview, 'dt' dept detail, 'd' dept view).
+// A card opens only in the list it was clicked in, so form ids stay unique.
+function card(o,isAdmin,scope){
+  const isOpen=openId===o.id && openScope===scope;
   const tag=isAdmin? `<span class="dtag">${getDeptName(o.dept)}</span>`:'';
   const src=SRC_N[o.source] || '';
 
-  return `<div class="oc" id="c${o.id}">
-    <div class="oh" onclick="tog(${o.id})">
+  return `<div class="oc">
+    <div class="oh" onclick="tog(${o.id},'${scope}')">
       <span class="on2">#${String(o.id).slice(-4)}</span>
       <span class="op ${P_CLS[o.priority || 'mid']}"></span>
       <span class="os2">${o.short}</span>
@@ -1208,13 +1111,11 @@ function card(o,isAdmin){
   </div>`;
 }
 
-async function tog(id){
-  openId=openId===id?null:id;
-  await rerender();
-
-  if(openId){
-    await loadActions(id);
-  }
+function tog(id,scope){
+  const closing=openId===id && openScope===scope;
+  openId=closing?null:id;
+  openScope=closing?'':scope;
+  paint();
 }
 
 async function saveCard(id){
@@ -1262,7 +1163,6 @@ async function saveCard(id){
   toast('تم حفظ الإجراء ✓');
 
   await rerender();
-  await loadActions(id);
 }
 
 async function delObs(id,e){
@@ -1280,45 +1180,14 @@ async function delObs(id,e){
   if(openId===id) openId=null;
 
   toast('تم الحذف');
-  rerender();
+  await rerender();
 }
 
-async function rerender(){
-  if(!CU) return;
+function exportXL(all){
+  // OBS is already scoped to the user's dept for dept users
+  const data=all && aProj!=='all' ? OBS.filter(o=>o.dept===aProj) : OBS;
 
-  const keepOpen = openId;
-
-  if(CU.role === 'admin' || CU.role === 'limited_admin'){
-    await renderAdmin();
-
-    openId = keepOpen;
-
-    if(openId){
-      await loadActions(openId);
-    }
-
-    await renderDeptTab();
-
-    openId = keepOpen;
-
-  } else {
-    await renderDept();
-
-    if(openId){
-      await loadActions(openId);
-    }
-  }
-}
-
-async function exportXL(all){
-  let q=SB.from('observations').select('*').order('added',{ascending:false});
-
-  if(!all) q=q.eq('dept',CU.dept);
-  else if(aProj!=='all') q=q.eq('dept',aProj);
-
-  const {data}=await q;
-
-  if(!data || !data.length){
+  if(!data.length){
     toast('لا توجد بيانات للتصدير');
     return;
   }
