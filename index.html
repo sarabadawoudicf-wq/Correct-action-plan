@@ -72,9 +72,14 @@ body{font-family:'Elm',sans-serif;background:var(--bg);color:var(--txt);min-heig
 .wrap{padding:26px;max-width:1080px;margin:0 auto;}
 
 /* ── REMINDER BANNER ─────────────────────────────────────── */
-.rban{background:var(--abg);border:1px solid #e8c040;border-right:4px solid var(--amb);border-radius:11px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;}
-.rtxt{font-size:13px;color:#6a4800;line-height:1.6;flex:1;}
-.rcls{background:none;border:none;cursor:pointer;font-size:20px;color:#a07000;line-height:1;}
+.rban{width:100%;background:linear-gradient(90deg,#fdf3dc,var(--abg) 60%,#fdf3dc);border-bottom:1px solid #efd58a;box-shadow:inset 0 3px 0 var(--gold);}
+.rin{max-width:1080px;margin:0 auto;padding:11px 26px;display:flex;align-items:center;gap:12px;}
+.ric{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--gold2),var(--amb));box-shadow:0 2px 6px rgba(196,127,16,.3);}
+.rtxt{font-size:13.5px;color:#6a4800;line-height:1.6;flex:1;}
+.rtxt strong{color:var(--navy);font-weight:600;}
+.rcls{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:none;border:none;cursor:pointer;color:#a07000;transition:background .15s,color .15s;}
+.rcls:hover{background:rgba(196,127,16,.12);color:var(--navy);}
+.rcls:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
 
 /* ── STATS ───────────────────────────────────────────────── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px;}
@@ -242,7 +247,7 @@ body{font-family:'Elm',sans-serif;background:var(--bg);color:var(--txt);min-heig
   .fgrid,.frow,.ejs-fields{grid-template-columns:1fr;}
   .urow,.uhdr{grid-template-columns:1fr 1fr 1fr 36px;}
   .urow .ulbl{display:none;}
-  .wrap{padding:14px;}.nav{padding:0 14px;}.lc{padding:30px 18px;}
+  .wrap{padding:14px;}.nav{padding:0 14px;}.rin{padding:10px 14px;}.lc{padding:30px 18px;}
 }
 
 /* ── PROJECT CIRCLES ─────────────────────────────────────── */
@@ -413,12 +418,19 @@ create policy "open_access" on observations
     </div>
   </nav>
 
-  <div class="wrap">
-    <div class="rban" id="rem" style="display:none;">
-      <span style="font-size:18px;">⏰</span>
+  <div class="rban" id="rem" role="alert" style="display:none;">
+    <div class="rin">
+      <span class="ric" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/></svg>
+      </span>
       <div class="rtxt" id="rem-txt"></div>
-      <button class="rcls" onclick="this.parentElement.style.display='none'">×</button>
+      <button class="rcls" aria-label="إغلاق" onclick="this.closest('.rban').style.display='none'">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
+  </div>
+
+  <div class="wrap">
 
     <!-- DEPT VIEW -->
     <div id="dv" style="display:none;">
