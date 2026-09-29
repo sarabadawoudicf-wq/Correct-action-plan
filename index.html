@@ -130,7 +130,12 @@ body{font-family:'Elm',sans-serif;background:var(--bg);color:var(--txt);min-heig
   flex-wrap:wrap;
 }
 
-.chip{font-size:11.5px;padding:4px 13px;border-radius:99px;border:1px solid var(--bdr);background:var(--w);color:var(--mut);cursor:pointer;font-family:inherit;transition:all .14s;}
+.chip{font-size:11.5px;padding:4px 13px 4px 6px;border-radius:99px;border:1px solid var(--bdr);background:var(--w);color:var(--mut);cursor:pointer;font-family:inherit;transition:all .14s;display:inline-flex;align-items:center;gap:6px;}
+.ccnt{min-width:20px;padding:1px 6px;border-radius:99px;background:var(--bg);color:var(--navy);font-size:11px;font-weight:600;text-align:center;line-height:1.5;}
+.chip.r .ccnt{background:var(--rbg);color:var(--red);}
+.chip.a .ccnt{background:var(--abg);color:var(--amb);}
+.chip.g .ccnt{background:var(--gbg);color:var(--grn);}
+.chip.on .ccnt{background:rgba(255,255,255,.22);color:#fff;}
 .chip:hover{border-color:var(--navy);color:var(--navy);}
 .chip.on{background:var(--navy);color:#fff;border-color:var(--navy);}
 .chip.on.r{background:var(--red);border-color:var(--red);}
@@ -187,6 +192,7 @@ body{font-family:'Elm',sans-serif;background:var(--bg);color:var(--txt);min-heig
 
 /* ── ADD FORM ────────────────────────────────────────────── */
 .acard{background:var(--w);border:1px solid var(--bdr);border-radius:14px;padding:24px;box-shadow:var(--sh);max-width:650px;}
+.acard.acenter{margin:0 auto;}
 .acard h3{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:16px;}
 .fg2{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
 .fg2 label{font-size:12px;color:var(--mut);font-weight:500;}
@@ -196,19 +202,6 @@ body{font-family:'Elm',sans-serif;background:var(--bg);color:var(--txt);min-heig
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .badd{padding:10px 26px;background:var(--navy);color:#fff;border:none;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:500;cursor:pointer;}
 .badd:hover{background:var(--navy2);}
-
-/* ── DEPT CARDS ───────────────────────────────────────────── */
-.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:13px;margin-bottom:24px;}
-.dc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;padding:17px;box-shadow:var(--sh);}
-.dc.sel{border-color:var(--navy);}
-.dn{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:9px;}
-.dbw{height:5px;background:var(--bg);border-radius:99px;margin:5px 0 10px;overflow:hidden;}
-.db{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--grn),#2ecc71);transition:width .5s;}
-.drow{display:flex;gap:12px;}
-.dm{text-align:center;}
-.dmv{font-size:17px;font-weight:600;}
-.dmv.r{color:var(--red);}.dmv.a{color:var(--amb);}.dmv.g{color:var(--grn);}
-.dml{font-size:10px;color:var(--mut);}
 
 /* ── SETTINGS ─────────────────────────────────────────────── */
 .scard{background:var(--w);border:1px solid var(--bdr);border-radius:14px;padding:24px;box-shadow:var(--sh);max-width:680px;margin-bottom:20px;}
@@ -251,6 +244,11 @@ body{font-family:'Elm',sans-serif;background:var(--bg);color:var(--txt);min-heig
 }
 
 /* ── PROJECT CIRCLES ─────────────────────────────────────── */
+.psearch{position:relative;max-width:420px;margin:0 auto 20px;color:var(--mut);}
+.psearch svg{position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;}
+.psearch input{width:100%;padding:12px 44px 12px 14px;border:1px solid var(--bdr);border-radius:12px;background:var(--w);font-family:inherit;font-size:14px;color:var(--txt);direction:rtl;outline:none;box-shadow:var(--sh);transition:border-color .15s,box-shadow .15s;}
+.psearch input:focus{border-color:var(--navy3);box-shadow:0 0 0 3px rgba(46,67,126,.12);}
+.pnone{width:100%;text-align:center;color:var(--mut);font-size:13px;padding:10px 0;}
 .proj-circles{display:flex;flex-wrap:wrap;gap:18px 14px;margin:4px 0 22px;justify-content:center;}
 .pcirc{display:flex;flex-direction:column;align-items:center;gap:7px;width:92px;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;}
 .pring{position:relative;width:72px;height:72px;border-radius:50%;background:var(--w);box-shadow:var(--sh);transition:transform .16s,box-shadow .16s;}
@@ -448,10 +446,10 @@ create policy "open_access" on observations
         <span class="st" id="d-title">ملاحظاتك التصحيحية</span>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <div class="chips" id="d-chips">
-            <button class="chip on" onclick="df(this,'all')">الكل</button>
-            <button class="chip r" onclick="df(this,'pending')">لم تُعالَج</button>
-            <button class="chip a" onclick="df(this,'progress')">قيد المعالجة</button>
-            <button class="chip g" onclick="df(this,'done')">مكتملة</button>
+            <button class="chip on" onclick="df(this,'all')">الكل<span class="ccnt" data-k="all">0</span></button>
+            <button class="chip r" onclick="df(this,'pending')">لم تُعالَج<span class="ccnt" data-k="pending">0</span></button>
+            <button class="chip a" onclick="df(this,'progress')">قيد المعالجة<span class="ccnt" data-k="progress">0</span></button>
+            <button class="chip g" onclick="df(this,'done')">مكتملة<span class="ccnt" data-k="done">0</span></button>
           </div>
           <button class="bxl" onclick="exportXL(false)">تصدير Excel</button>
         </div>
@@ -476,29 +474,16 @@ create policy "open_access" on observations
           <div class="sc amb"><div class="sl">قيد المعالجة</div><div class="sv" id="a-prg">—</div></div>
           <div class="sc grn"><div class="sl">مكتملة</div><div class="sv" id="a-don">—</div></div>
         </div>
-        <div class="proj-circles" id="dept-filter-chips"></div>
+        <div class="proj-circles" id="ov-circles"></div>
         <div class="pw">
           <div class="phx"><span class="plx" id="a-pct-lbl">نسبة الإنجاز الكلية</span><span class="pp" id="a-pct">—</span></div>
           <div class="pt"><div class="pf" id="a-bar" style="width:0%"></div></div>
         </div>
-        <div class="sh">
-          <span class="st">جميع الملاحظات</span>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <div class="chips" id="a-chips">
-              <button class="chip on" onclick="af(this,'all')">الكل</button>
-              <button class="chip r" onclick="af(this,'pending')">لم تُعالَج</button>
-              <button class="chip a" onclick="af(this,'progress')">قيد المعالجة</button>
-              <button class="chip g" onclick="af(this,'done')">مكتملة</button>
-            </div>
-            <button class="bxl" onclick="exportXL(true)">تصدير Excel</button>
-          </div>
-        </div>
-        <div class="olist" id="a-list"></div>
       </div>
 
       <!-- ADD -->
       <div class="tp" id="tp-ad">
-        <div class="acard">
+        <div class="acard acenter">
           <h3>إضافة ملاحظة جديدة</h3>
           <div class="frow" style="margin-bottom:12px;">
             <div class="fg2"><label>القسم المعني</label><select id="n-d"><option value="">— اختر —</option></select></div>
@@ -517,19 +502,26 @@ create policy "open_access" on observations
       <!-- DEPT DETAIL -->
 <div class="tp" id="tp-dt">
 
-  <div class="acard" style="max-width:420px;margin-bottom:18px;">
-    <label style="font-size:13px;color:var(--mut);font-weight:600;">اختر القسم</label>
-    <select id="dt-select" onchange="changeDeptDetail(this.value)" style="margin-top:8px;width:100%;padding:10px;border:1px solid var(--bdr);border-radius:10px;font-family:inherit;">
-    </select>
+  <div class="psearch">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="search" id="p-q" placeholder="ابحث عن مشروع..." aria-label="ابحث عن مشروع" oninput="pq=this.value;renderDtCircles()">
   </div>
-
-  <div class="dgrid" id="dept-grid"></div>
+  <div class="proj-circles" id="dept-filter-chips"></div>
 
   <div class="sh">
-    <span class="st" id="dt-title">—</span>
+    <span class="st" id="a-ttl">جميع الملاحظات</span>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <div class="chips" id="a-chips">
+        <button class="chip on" onclick="af(this,'all')">الكل<span class="ccnt" data-k="all">0</span></button>
+        <button class="chip r" onclick="af(this,'pending')">لم تُعالَج<span class="ccnt" data-k="pending">0</span></button>
+        <button class="chip a" onclick="af(this,'progress')">قيد المعالجة<span class="ccnt" data-k="progress">0</span></button>
+        <button class="chip g" onclick="af(this,'done')">مكتملة<span class="ccnt" data-k="done">0</span></button>
+      </div>
+      <button class="bxl" onclick="exportXL(true)">تصدير Excel</button>
+    </div>
   </div>
 
-  <div class="olist" id="dt-list"></div>
+  <div class="olist" id="a-list"></div>
 
 </div>
 
@@ -555,7 +547,7 @@ const S_CLS={pending:'sp0',progress:'sp1',done:'sp2'};
 const P_CLS={high:'ph2',mid:'pm',low:'plo'};
 const P_LBL={high:'عالية',mid:'متوسطة',low:'منخفضة'};
 
-let SB=null, CU=null, USERS=[], DEPTS=[], OBS=[], aFil='all', aProj='all', dFil='all', selDept='', openId=null, openScope='';
+let SB=null, CU=null, USERS=[], DEPTS=[], OBS=[], aFil='all', aProj='all', oProj='all', pq='', dFil='all', openId=null, openScope='';
 
 const $=id=>document.getElementById(id);
 const $s=(id,v)=>{const e=$(id); if(e)e.textContent=v;};
@@ -568,6 +560,11 @@ function toast(msg){
   t.textContent=msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function chipCounts(cid,obs){
+  const c=counts(obs), m={all:c.tot,pending:c.pnd,progress:c.prg,done:c.don};
+  document.querySelectorAll('#'+cid+' .ccnt').forEach(e=>e.textContent=m[e.dataset.k]??0);
 }
 
 function chOn(cid,el){
@@ -651,8 +648,10 @@ async function restoreSession(){
 async function openAppByRole(){
   aFil = 'all';
   aProj = 'all';
+  oProj = 'all';
   dFil = 'all';
-  selDept = '';
+  pq = '';
+  if($('p-q')) $('p-q').value='';
   openId = null;
   openScope = '';
   OBS = [];
@@ -728,8 +727,9 @@ async function logout(){
   openScope='';
   aFil='all';
   aProj='all';
+  oProj='all';
   dFil='all';
-  selDept='';
+  pq='';
 
   hide('app');
   hide('av');
@@ -779,7 +779,6 @@ function paint(){
 
   if(isAdmin()){
     renderAdmin();
-    renderDeptTab();
   }else{
     renderDept();
   }
@@ -824,6 +823,7 @@ function listHTML(obs,scope,isAdminCard,emptyIcon,emptyMsg){
 
 function renderDept(){
   setStats('d',OBS);
+  chipCounts('d-chips',OBS);
 
   const f=dFil==='all'?OBS:OBS.filter(o=>o.status===dFil);
   $('d-list').innerHTML=listHTML(f,'d',false,'✅','لا توجد ملاحظات بهذا الفلتر');
@@ -840,12 +840,20 @@ function df(el,f){
 
 function renderAdmin(){
   if(aProj!=='all' && !DEPTS.some(d=>d.dept===aProj)) aProj='all';
-  renderProjCircles(OBS);
+  if(oProj!=='all' && !DEPTS.some(d=>d.dept===oProj)) oProj='all';
 
-  // Stats reflect the selected project
+  // Overview: stats follow the overview circle selection
+  renderProjCircles('ov-circles',oProj,'',p=>{oProj=oProj===p?'all':p;renderAdmin();});
+  const ov=oProj==='all'?OBS:OBS.filter(o=>o.dept===oProj);
+  setStats('a',ov);
+  $s('a-pct-lbl',oProj==='all'?'نسبة الإنجاز الكلية':'نسبة إنجاز '+getDeptName(oProj));
+
+  // Dept detail: list follows its own circle selection
+  renderDtCircles();
+
   const scope=aProj==='all'?OBS:OBS.filter(o=>o.dept===aProj);
-  setStats('a',scope);
-  $s('a-pct-lbl',aProj==='all'?'نسبة الإنجاز الكلية':'نسبة إنجاز '+getDeptName(aProj));
+  $s('a-ttl',aProj==='all'?'جميع الملاحظات':'ملاحظات '+getDeptName(aProj));
+  chipCounts('a-chips',scope);
 
   const filt=['pending','progress','done'].includes(aFil)
     ? scope.filter(o=>o.status===aFil)
@@ -867,14 +875,21 @@ function pf(p){
   renderAdmin();
 }
 
-function renderProjCircles(all){
-  const c=$('dept-filter-chips');
+function renderDtCircles(){
+  renderProjCircles('dept-filter-chips',aProj,pq,pf);
+}
+
+// Renders project progress circles into container `cid`; `sel` is the active key,
+// `query` filters by project name, `pick(key)` handles clicks.
+function renderProjCircles(cid,sel,query,pick){
+  const c=$(cid);
   if(!c) return;
+  const all=OBS;
 
   const C=2*Math.PI*33;
   const circ=(key,label,obs,extra)=>{
     const {tot,pct}=counts(obs);
-    const on=aProj===key;
+    const on=sel===key;
     return `<button class="pcirc ${extra||''} ${on?'on':''}" data-p="${esc(key)}" aria-pressed="${on}"
       title="${esc(label)} — ${tot} ملاحظة، ${pct}% مكتملة">
       <span class="pring">
@@ -886,10 +901,14 @@ function renderProjCircles(all){
     </button>`;
   };
 
-  c.innerHTML=circ('all','جميع المشاريع',all,'all')+
-    DEPTS.map(d=>circ(d.dept,d.label,all.filter(o=>o.dept===d.dept))).join('');
+  const q=query.trim().toLowerCase();
+  const shown=q?DEPTS.filter(d=>String(d.label).toLowerCase().includes(q)):DEPTS;
 
-  c.querySelectorAll('.pcirc').forEach(b=>b.onclick=()=>pf(b.dataset.p));
+  c.innerHTML=(q?'':circ('all','جميع المشاريع',all,'all'))+
+    shown.map(d=>circ(d.dept,d.label,all.filter(o=>o.dept===d.dept))).join('')+
+    (q&&!shown.length?'<div class="pnone">لا توجد مشاريع مطابقة</div>':'');
+
+  c.querySelectorAll('.pcirc').forEach(b=>b.onclick=()=>pick(b.dataset.p));
 }
 
 async function buildDeptFilter(){
@@ -914,50 +933,6 @@ async function buildDeptFilter(){
     o.textContent=d.label;
     sel.appendChild(o);
   });
-}
-
-// ══ ADMIN DEPT DETAIL ═══════════════════════════════════════
-
-function changeDeptDetail(value){
-  selDept = value;
-  openId = null;
-  renderDeptTab();
-}
-
-function renderDeptTab(){
-  if(!DEPTS.length){
-    $('dept-grid').innerHTML='<div class="empty">لا توجد أقسام مضافة</div>';
-    $('dt-title').textContent='—';
-    $('dt-list').innerHTML='';
-    return;
-  }
-
-  if(!DEPTS.some(d=>d.dept===selDept)) selDept=DEPTS[0].dept;
-
-  $('dt-select').innerHTML=DEPTS.map(d=>
-    `<option value="${esc(d.dept)}" ${d.dept===selDept?'selected':''}>${esc(d.label)}</option>`
-  ).join('');
-
-  const obs=OBS.filter(o=>o.dept===selDept);
-  const {tot,don,prg,pnd,pct}=counts(obs);
-
-  $('dept-grid').innerHTML=`<div class="dc sel">
-      <div class="dn">${esc(getDeptName(selDept))}</div>
-      <div style="display:flex;justify-content:space-between">
-        <span style="font-size:11px;color:var(--mut)">الإنجاز</span>
-        <span style="font-size:12px;font-weight:600;color:var(--navy)">${pct}%</span>
-      </div>
-      <div class="dbw"><div class="db" style="width:${pct}%"></div></div>
-      <div class="drow">
-        <div class="dm"><div class="dmv r">${pnd}</div><div class="dml">معلق</div></div>
-        <div class="dm"><div class="dmv a">${prg}</div><div class="dml">جارٍ</div></div>
-        <div class="dm"><div class="dmv g">${don}</div><div class="dml">منجز</div></div>
-        <div class="dm"><div class="dmv">${tot}</div><div class="dml">إجمالي</div></div>
-      </div>
-    </div>`;
-
-  $s('dt-title','ملاحظات '+getDeptName(selDept));
-  $('dt-list').innerHTML=listHTML(obs,'dt',true,'📋','لا توجد ملاحظات لهذا القسم');
 }
 
 async function addObs(){
@@ -1054,7 +1029,7 @@ return '<div class="' + itemClass + '">' +
   }).join('')+'</div>';
 }
 
-// scope = which list the card is in ('a' overview, 'dt' dept detail, 'd' dept view).
+// scope = which list the card is in ('a' admin dept detail, 'd' dept view).
 // A card opens only in the list it was clicked in, so form ids stay unique.
 function card(o,isAdmin,scope){
   const isOpen=openId===o.id && openScope===scope;
