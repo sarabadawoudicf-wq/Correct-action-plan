@@ -45,6 +45,37 @@
 - The login field is labeled "البريد الإلكتروني" instead of "اسم المستخدم", since login uses email.
 
 ### Performance and cleanup
-- Data is loaded once. Filters, tabs, and opening cards no longer reload it.
-- Data reloads only after saving, adding, or deleting an observation.
-- Removed duplicated and unused CSS and code.
+The site now loads observations from the database once and reuses them, instead of reloading on almost every click.
+
+**Before:** several functions fetched from Supabase on their own:
+
+| Function | Fetched | When |
+|---|---|---|
+| `renderAdmin()` | all observations | every overview redraw |
+| `renderDeptTab()` | all departments and all observations | every section-details redraw |
+| `selDD()` | one department's observations | picking a department |
+| `renderDept()` | the department's observations | every department-view redraw |
+| `checkReminder()` | overdue observations | after login |
+| `exportXL()` | observations again | every Excel export |
+| `tog()` (open a card) | everything above, through `rerender()` | every card open or close |
+
+**After:**
+- `loadObs()` is the only function that fetches observations. It stores them in `OBS`.
+- `renderAdmin()`, `renderDept()` and `renderDeptTab()` no longer fetch. They filter `OBS`.
+- `paint()` only redraws the page. `rerender()` fetches with `loadObs()` and then calls `paint()`.
+- Opening or closing a card (`tog()`) calls `paint()`, so it makes no database request.
+- `checkReminder()` and `exportXL()` use `OBS` instead of their own requests.
+- Departments are loaded once at login into `DEPTS`.
+- Removed repeated `loadActions()` calls in `rerender()` and `saveCard()`.
+
+**Database requests per action:**
+
+| Action | Before | After |
+|---|---|---|
+| Login | ~4 | 2 (observations and departments) |
+| Switching tab, filter, or project | 1–3 | 0 |
+| Opening or closing a card | ~3 | 0 (only that card's actions load) |
+| Excel export | 1 | 0 |
+| Adding, saving, or deleting an observation | ~3 | 1 |
+
+Removed duplicated and unused CSS and code.
