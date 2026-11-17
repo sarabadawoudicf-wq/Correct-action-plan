@@ -11,7 +11,11 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap');
+@font-face{font-family:'Elm';src:url('fonts/Elm-Extralight.ttf') format('truetype');font-weight:200;font-display:swap;}
+@font-face{font-family:'Elm';src:url('fonts/Elm-Light.ttf') format('truetype');font-weight:300;font-display:swap;}
+@font-face{font-family:'Elm';src:url('fonts/Elm-Regular.ttf') format('truetype');font-weight:400;font-display:swap;}
+@font-face{font-family:'Elm';src:url('fonts/Elm-Medium.ttf') format('truetype');font-weight:500;font-display:swap;}
+@font-face{font-family:'Elm';src:url('fonts/Elm-Bold.ttf') format('truetype');font-weight:600 700;font-display:swap;}
 :root{
   --navy:#1b2b52;--navy2:#243668;--navy3:#2e437e;
   --gold:#c8962a;--gold2:#e8b84b;
@@ -22,7 +26,7 @@
   --sh:0 2px 14px rgba(27,43,82,.08);--shm:0 4px 28px rgba(27,43,82,.13);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;direction:rtl}
+body{font-family:'Elm',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;direction:rtl}
 
 /* ── SETUP ───────────────────────────────────────────────── */
 #setup{position:fixed;inset:0;background:rgba(10,15,35,.9);z-index:1000;display:none !important;align-items:center;justify-content:center;overflow-y:auto;padding:20px;}
@@ -68,19 +72,28 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .wrap{padding:26px;max-width:1080px;margin:0 auto;}
 
 /* ── REMINDER BANNER ─────────────────────────────────────── */
-.rban{background:var(--abg);border:1px solid #e8c040;border-right:4px solid var(--amb);border-radius:11px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;}
-.rtxt{font-size:13px;color:#6a4800;line-height:1.6;flex:1;}
-.rcls{background:none;border:none;cursor:pointer;font-size:20px;color:#a07000;line-height:1;}
+.rban{width:100%;background:linear-gradient(90deg,#fdf3dc,var(--abg) 60%,#fdf3dc);border-bottom:1px solid #efd58a;box-shadow:inset 0 3px 0 var(--gold);}
+.rin{max-width:1080px;margin:0 auto;padding:11px 26px;display:flex;align-items:center;gap:12px;}
+.ric{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--gold2),var(--amb));box-shadow:0 2px 6px rgba(196,127,16,.3);}
+.rtxt{font-size:13.5px;color:#6a4800;line-height:1.6;flex:1;}
+.rtxt strong{color:var(--navy);font-weight:600;}
+.rcls{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:none;border:none;cursor:pointer;color:#a07000;transition:background .15s,color .15s;}
+.rcls:hover{background:rgba(196,127,16,.12);color:var(--navy);}
+.rcls:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
 
 /* ── STATS ───────────────────────────────────────────────── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:22px;}
-.sc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;padding:17px 19px;box-shadow:var(--sh);position:relative;overflow:hidden;}
-.sc::after{content:'';position:absolute;top:0;right:0;width:4px;height:100%;}
-.sc.tot::after{background:var(--navy3);}.sc.red::after{background:var(--red);}
-.sc.amb::after{background:var(--amb);}.sc.grn::after{background:var(--grn);}
-.sl{font-size:11.5px;color:var(--mut);margin-bottom:6px;}
-.sv{font-size:26px;font-weight:600;}
-.sc.red .sv{color:var(--red);}.sc.amb .sv{color:var(--amb);}.sc.grn .sv{color:var(--grn);}
+.sc{border-radius:16px;padding:18px 20px;color:#fff;position:relative;overflow:hidden;box-shadow:0 10px 24px -12px var(--scs);transition:transform .18s,box-shadow .18s;}
+.sc:hover{transform:translateY(-2px);box-shadow:0 14px 28px -12px var(--scs);}
+.sc::before,.sc::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none;}
+.sc::before{width:120px;height:120px;top:-48px;left:-36px;}
+.sc::after{width:70px;height:70px;bottom:-34px;left:34px;background:rgba(255,255,255,.08);}
+.sc.tot{background:linear-gradient(135deg,#3a5299,#1b2b52);--scs:rgba(27,43,82,.7);}
+.sc.red{background:linear-gradient(135deg,#e35d5d,#a82626);--scs:rgba(168,38,38,.6);}
+.sc.amb{background:linear-gradient(135deg,#e39a1e,#a8620a);--scs:rgba(168,98,10,.6);}
+.sc.grn{background:linear-gradient(135deg,#2fae6e,#136a3d);--scs:rgba(19,106,61,.6);}
+.sl{font-size:12px;color:rgba(255,255,255,.85);margin-bottom:6px;position:relative;}
+.sv{font-size:28px;font-weight:600;position:relative;}
 .pw{margin-bottom:22px;}
 .phx{display:flex;justify-content:space-between;margin-bottom:5px;}
 .plx{font-size:12.5px;color:var(--mut);}
@@ -107,21 +120,6 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
   box-shadow:var(--sh);
 }
 
-#dept-filter-chips{
-  display:flex;
-  gap:8px;
-  flex-wrap:nowrap;
-  overflow-x:auto;
-  padding-bottom:4px;
-  background:transparent;
-  border: none;
-}
-
-#dept-filter-chips .chip{
-  white-space:nowrap;
-  flex:0 0 auto;
-}
-
 
   
 .st{font-size:15px;font-weight:600;color:var(--navy);}
@@ -132,35 +130,25 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
   flex-wrap:wrap;
 }
 
-#dept-filter-chips{
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  background:#f8faff;
-  border:1px solid var(--bdr);
-  border-radius:12px;
-  display:flex;
-  gap:8px;
-  flex-wrap:nowrap;
-  overflow-x:auto;
-}
-
-#dept-filter-chips .chip{
-  white-space:nowrap;
-  flex:0 0 auto;
-}
-
-.chip{font-size:11.5px;padding:4px 13px;border-radius:99px;border:1px solid var(--bdr);background:var(--w);color:var(--mut);cursor:pointer;font-family:inherit;transition:all .14s;}
+.chip{font-size:11.5px;padding:4px 13px 4px 6px;border-radius:99px;border:1px solid var(--bdr);background:var(--w);color:var(--mut);cursor:pointer;font-family:inherit;transition:all .14s;display:inline-flex;align-items:center;gap:6px;}
+.ccnt{min-width:20px;padding:1px 6px;border-radius:99px;background:var(--bg);color:var(--navy);font-size:11px;font-weight:600;text-align:center;line-height:1.5;}
+.chip.r .ccnt{background:var(--rbg);color:var(--red);}
+.chip.a .ccnt{background:var(--abg);color:var(--amb);}
+.chip.g .ccnt{background:var(--gbg);color:var(--grn);}
+.chip.on .ccnt{background:rgba(255,255,255,.22);color:#fff;}
 .chip:hover{border-color:var(--navy);color:var(--navy);}
 .chip.on{background:var(--navy);color:#fff;border-color:var(--navy);}
 .chip.on.r{background:var(--red);border-color:var(--red);}
 .chip.on.a{background:var(--amb);border-color:var(--amb);}
 .chip.on.g{background:var(--grn);border-color:var(--grn);}
-.bxl{padding:6px 14px;border-radius:8px;border:1px solid var(--bdr);background:var(--w);color:var(--txt);font-family:inherit;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .14s;}
-.bxl:hover{background:var(--surf);}
+.bxl{padding:6px 14px;border-radius:8px;border:1px solid #b9dcc8;background:var(--w);color:#107c41;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .14s,border-color .14s;}
+.bxl::before{content:'';width:18px;height:18px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='3' width='14' height='18' rx='2' fill='%2321a366'/%3E%3Cpath d='M14 3v18M7 9h14M7 15h14' stroke='%23fff' stroke-opacity='.55'/%3E%3Crect x='3' y='6.5' width='11' height='11' rx='1.6' fill='%23107c41'/%3E%3Cpath d='M6.2 9.4l4.6 5.2M10.8 9.4l-4.6 5.2' stroke='%23fff' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;}
+.bxl:hover{background:#eaf6ef;border-color:#107c41;}
 
 /* ── OBS CARDS ───────────────────────────────────────────── */
-.olist{display:flex;flex-direction:column;gap:0px;}
+.olist{display:flex;flex-direction:column;gap:14px;}
+.olist>.oc{width:100%;margin:0 0 16px;}
+.olist>.oc:last-child{margin-bottom:0;}
 .oc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;overflow:hidden;box-shadow:var(--sh);transition:box-shadow .18s;}
 .oc:hover{box-shadow:var(--shm);}
 .oh{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none;}
@@ -194,13 +182,17 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .loading-row{text-align:center;padding:28px;font-size:13px;color:var(--mut);}
 
 /* ── ADMIN TABS ───────────────────────────────────────────── */
-.atabs{display:flex;border-bottom:2px solid var(--bdr);margin-bottom:20px;gap:0;overflow-x:auto;}
-.atab{padding:10px 18px;font-size:13px;font-family:inherit;cursor:pointer;background:none;border:none;color:var(--mut);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .14s;font-weight:500;white-space:nowrap;}
-.atab.on{color:var(--navy);border-bottom-color:var(--navy);}
+.atabs{display:flex;justify-content:center;gap:10px;margin:4px auto 24px;padding:6px;width:fit-content;max-width:100%;overflow-x:auto;background:linear-gradient(180deg,#fff,var(--surf));border:1px solid var(--bdr);border-radius:14px;box-shadow:0 2px 10px rgba(27,43,82,.06);}
+.atab{min-width:150px;padding:13px 26px;font-size:15px;font-family:inherit;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--navy);background:linear-gradient(180deg,#fff,#f0f3fb);border:1px solid var(--bdr);border-radius:10px;transition:background .18s,color .18s,box-shadow .18s,transform .18s,border-color .18s;}
+.atab:hover{border-color:var(--navy3);box-shadow:0 3px 10px rgba(27,43,82,.12);transform:translateY(-1px);}
+.atab:focus-visible{outline:2px solid var(--gold2);outline-offset:2px;}
+.atab.on{color:#fff;background:linear-gradient(135deg,var(--navy3),var(--navy));border-color:var(--navy);box-shadow:0 4px 14px rgba(27,43,82,.28);transform:none;}
+@media (max-width:560px){.atabs{width:100%;gap:6px;}.atab{min-width:0;flex:1;padding:12px 10px;font-size:14px;}}
 .tp{display:none;}.tp.show{display:block;}
 
 /* ── ADD FORM ────────────────────────────────────────────── */
 .acard{background:var(--w);border:1px solid var(--bdr);border-radius:14px;padding:24px;box-shadow:var(--sh);max-width:650px;}
+.acard.acenter{margin:0 auto;}
 .acard h3{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:16px;}
 .fg2{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
 .fg2 label{font-size:12px;color:var(--mut);font-weight:500;}
@@ -210,20 +202,6 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .badd{padding:10px 26px;background:var(--navy);color:#fff;border:none;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:500;cursor:pointer;}
 .badd:hover{background:var(--navy2);}
-
-/* ── DEPT CARDS ───────────────────────────────────────────── */
-.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:13px;margin-bottom:24px;}
-.dc{background:var(--w);border:1px solid var(--bdr);border-radius:13px;padding:17px;box-shadow:var(--sh);cursor:pointer;transition:box-shadow .18s,border-color .18s;}
-.dc:hover{box-shadow:var(--shm);}
-.dc.sel{border-color:var(--navy);}
-.dn{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:9px;}
-.dbw{height:5px;background:var(--bg);border-radius:99px;margin:5px 0 10px;overflow:hidden;}
-.db{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--grn),#2ecc71);transition:width .5s;}
-.drow{display:flex;gap:12px;}
-.dm{text-align:center;}
-.dmv{font-size:17px;font-weight:600;}
-.dmv.r{color:var(--red);}.dmv.a{color:var(--amb);}.dmv.g{color:var(--grn);}
-.dml{font-size:10px;color:var(--mut);}
 
 /* ── SETTINGS ─────────────────────────────────────────────── */
 .scard{background:var(--w);border:1px solid var(--bdr);border-radius:14px;padding:24px;box-shadow:var(--sh);max-width:680px;margin-bottom:20px;}
@@ -262,26 +240,36 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
   .fgrid,.frow,.ejs-fields{grid-template-columns:1fr;}
   .urow,.uhdr{grid-template-columns:1fr 1fr 1fr 36px;}
   .urow .ulbl{display:none;}
-  .wrap{padding:14px;}.nav{padding:0 14px;}.lc{padding:30px 18px;}
+  .wrap{padding:14px;}.nav{padding:0 14px;}.rin{padding:10px 14px;}.lc{padding:30px 18px;}
 }
 
-.dept-filter-clean{
-  width:100%;
-  margin:12px 0 18px;
-  padding:0;
-  background:transparent;
-  border:none;
-  box-shadow:none;
-  display:flex;
-  gap:8px;
-  flex-wrap:nowrap;
-  overflow-x:auto;
-}
-
-.dept-filter-clean .chip{
-  white-space:nowrap;
-  flex:0 0 auto;
-}
+/* ── PROJECT CIRCLES ─────────────────────────────────────── */
+.psearch{position:relative;max-width:420px;margin:0 auto 20px;color:var(--mut);}
+.psearch svg{position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;}
+.psearch input{width:100%;padding:12px 44px 12px 14px;border:1px solid var(--bdr);border-radius:12px;background:var(--w);font-family:inherit;font-size:14px;color:var(--txt);direction:rtl;outline:none;box-shadow:var(--sh);transition:border-color .15s,box-shadow .15s;}
+.psearch input:focus{border-color:var(--navy3);box-shadow:0 0 0 3px rgba(46,67,126,.12);}
+.pnone{width:100%;text-align:center;color:var(--mut);font-size:13px;padding:10px 0;}
+.proj-circles{display:flex;flex-wrap:wrap;gap:18px 14px;margin:4px 0 22px;justify-content:center;}
+.pcirc{display:flex;flex-direction:column;align-items:center;gap:7px;width:92px;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;}
+.pring{position:relative;width:72px;height:72px;border-radius:50%;background:var(--w);box-shadow:var(--sh);transition:transform .16s,box-shadow .16s;}
+.pring svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.pring .trk{fill:none;stroke:var(--bg);stroke-width:5;}
+.pring .val{fill:none;stroke:var(--grn);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .5s;}
+.pnum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;}
+.pnum b{font-size:17px;font-weight:600;color:var(--navy);}
+.pnum small{font-size:9.5px;color:var(--mut);}
+.plbl{font-size:11.5px;color:var(--mut);text-align:center;line-height:1.35;max-width:92px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;}
+.pcirc:hover .pring{transform:translateY(-2px);box-shadow:var(--shm);}
+.pcirc.on .pring{background:var(--navy);box-shadow:0 0 0 3px var(--w),0 0 0 5px var(--navy);}
+.pcirc.on .pring .trk{stroke:rgba(255,255,255,.15);}
+.pcirc.on .pring .val{stroke:var(--gold2);}
+.pcirc.on .pnum b{color:#fff;}
+.pcirc.on .pnum small{color:rgba(255,255,255,.7);}
+.pcirc.on .plbl{color:var(--navy);font-weight:600;}
+.pcirc.all .pring{border:1.5px dashed var(--bdr);}
+.pcirc.all.on .pring{border-color:transparent;}
+.pcirc:focus-visible{outline:none;}
+.pcirc:focus-visible .pring{box-shadow:0 0 0 3px var(--gold2);}
 
   
 .timeline{margin-top:8px;display:flex;flex-direction:column;gap:10px;}
@@ -364,48 +352,6 @@ body{font-family:'IBM Plex Sans Arabic',sans-serif;background:var(--bg);color:va
 .action-panel .fa {
   margin-top: 20px;
 }
-
-
-/* قائمة الملاحظات */
-.olist {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* كل ملاحظة بطاقة مستقلة */
-.olist > .oc {
-  width: 100%;
-  margin: 0;
-}
-
-/* صندوق الإجراءات يأخذ عرض البطاقة كاملًا */
-.action-panel {
-  width: 100%;
-  margin-top: 24px;
-  padding: 22px;
-  background: #ffffff;
-  border: 1px solid #dfe4ef;
-  border-radius: 18px;
-  box-shadow: 0 4px 14px rgba(31, 51, 92, 0.08);
-  box-sizing: border-box;
-}
-
-/* مسافة ثابتة بين كل ملاحظة والتي تليها */
-.olist > .oc {
-  margin-bottom: 16px;
-}
-
-/* آخر ملاحظة لا تحتاج مسافة إضافية */
-.olist > .oc:last-child {
-  margin-bottom: 0;
-}  
-
-
-
-
-  
-  
 </style>
 </head>
 <body>
@@ -448,8 +394,8 @@ create policy "open_access" on observations
     <div class="lic">🔍</div>
     <div class="lit">نظام متابعة الخطة التصحيحية</div>
     <div class="lis">إدارة الأداء والجودة<br>أدخل بيانات الدخول للمتابعة</div>
-    <label class="ll">اسم المستخدم</label>
-    <input class="li" id="li-u" type="text" placeholder="اسم المستخدم" autocomplete="username">
+    <label class="ll">البريد الإلكتروني</label>
+    <input class="li" id="li-u" type="email" placeholder="البريد الإلكتروني" autocomplete="username">
     <label class="ll">كلمة المرور</label>
     <input class="li" id="li-p" type="password" placeholder="كلمة المرور" autocomplete="current-password">
     <button class="lb" onclick="doLogin()">دخول إلى النظام</button>
@@ -470,12 +416,19 @@ create policy "open_access" on observations
     </div>
   </nav>
 
-  <div class="wrap">
-    <div class="rban" id="rem" style="display:none;">
-      <span style="font-size:18px;">⏰</span>
+  <div class="rban" id="rem" role="alert" style="display:none;">
+    <div class="rin">
+      <span class="ric" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/></svg>
+      </span>
       <div class="rtxt" id="rem-txt"></div>
-      <button class="rcls" onclick="this.parentElement.style.display='none'">×</button>
+      <button class="rcls" aria-label="إغلاق" onclick="this.closest('.rban').style.display='none'">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
+  </div>
+
+  <div class="wrap">
 
     <!-- DEPT VIEW -->
     <div id="dv" style="display:none;">
@@ -493,12 +446,12 @@ create policy "open_access" on observations
         <span class="st" id="d-title">ملاحظاتك التصحيحية</span>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <div class="chips" id="d-chips">
-            <button class="chip on" onclick="df(this,'all')">الكل</button>
-            <button class="chip r" onclick="df(this,'pending')">لم تُعالَج</button>
-            <button class="chip a" onclick="df(this,'progress')">قيد المعالجة</button>
-            <button class="chip g" onclick="df(this,'done')">مكتملة</button>
+            <button class="chip on" onclick="df(this,'all')">الكل<span class="ccnt" data-k="all">0</span></button>
+            <button class="chip r" onclick="df(this,'pending')">لم تُعالَج<span class="ccnt" data-k="pending">0</span></button>
+            <button class="chip a" onclick="df(this,'progress')">قيد المعالجة<span class="ccnt" data-k="progress">0</span></button>
+            <button class="chip g" onclick="df(this,'done')">مكتملة<span class="ccnt" data-k="done">0</span></button>
           </div>
-          <button class="bxl" onclick="exportXL(false)">⬇️ Excel</button>
+          <button class="bxl" onclick="exportXL(false)">تصدير Excel</button>
         </div>
       </div>
       <div class="olist" id="d-list"></div>
@@ -521,29 +474,16 @@ create policy "open_access" on observations
           <div class="sc amb"><div class="sl">قيد المعالجة</div><div class="sv" id="a-prg">—</div></div>
           <div class="sc grn"><div class="sl">مكتملة</div><div class="sv" id="a-don">—</div></div>
         </div>
+        <div class="proj-circles" id="ov-circles"></div>
         <div class="pw">
-          <div class="phx"><span class="plx">نسبة الإنجاز الكلية</span><span class="pp" id="a-pct">—</span></div>
+          <div class="phx"><span class="plx" id="a-pct-lbl">نسبة الإنجاز الكلية</span><span class="pp" id="a-pct">—</span></div>
           <div class="pt"><div class="pf" id="a-bar" style="width:0%"></div></div>
         </div>
-        <div class="sh">
-          <span class="st">جميع الملاحظات</span>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <div class="chips" id="a-chips">
-              <button class="chip on" onclick="af(this,'all')">الكل</button>
-              <button class="chip r" onclick="af(this,'pending')">لم تُعالَج</button>
-              <button class="chip a" onclick="af(this,'progress')">قيد المعالجة</button>
-              <button class="chip g" onclick="af(this,'done')">مكتملة</button>
-            </div>
-            <button class="bxl" onclick="exportXL(true)">⬇️ Excel</button>
-          </div>
-        </div>
-        <div class="chips dept-filter-clean" id="dept-filter-chips"></div>
-        <div class="olist" id="a-list"></div>
       </div>
 
       <!-- ADD -->
       <div class="tp" id="tp-ad">
-        <div class="acard">
+        <div class="acard acenter">
           <h3>إضافة ملاحظة جديدة</h3>
           <div class="frow" style="margin-bottom:12px;">
             <div class="fg2"><label>القسم المعني</label><select id="n-d"><option value="">— اختر —</option></select></div>
@@ -562,19 +502,26 @@ create policy "open_access" on observations
       <!-- DEPT DETAIL -->
 <div class="tp" id="tp-dt">
 
-  <div class="acard" style="max-width:420px;margin-bottom:18px;">
-    <label style="font-size:13px;color:var(--mut);font-weight:600;">اختر القسم</label>
-    <select id="dt-select" onchange="changeDeptDetail(this.value)" style="margin-top:8px;width:100%;padding:10px;border:1px solid var(--bdr);border-radius:10px;font-family:inherit;">
-    </select>
+  <div class="psearch">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="search" id="p-q" placeholder="ابحث عن مشروع..." aria-label="ابحث عن مشروع" oninput="pq=this.value;renderDtCircles()">
   </div>
-
-  <div class="dgrid" id="dept-grid"></div>
+  <div class="proj-circles" id="dept-filter-chips"></div>
 
   <div class="sh">
-    <span class="st" id="dt-title">—</span>
+    <span class="st" id="a-ttl">جميع الملاحظات</span>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <div class="chips" id="a-chips">
+        <button class="chip on" onclick="af(this,'all')">الكل<span class="ccnt" data-k="all">0</span></button>
+        <button class="chip r" onclick="af(this,'pending')">لم تُعالَج<span class="ccnt" data-k="pending">0</span></button>
+        <button class="chip a" onclick="af(this,'progress')">قيد المعالجة<span class="ccnt" data-k="progress">0</span></button>
+        <button class="chip g" onclick="af(this,'done')">مكتملة<span class="ccnt" data-k="done">0</span></button>
+      </div>
+      <button class="bxl" onclick="exportXL(true)">تصدير Excel</button>
+    </div>
   </div>
 
-  <div class="olist" id="dt-list"></div>
+  <div class="olist" id="a-list"></div>
 
 </div>
 
@@ -600,10 +547,11 @@ const S_CLS={pending:'sp0',progress:'sp1',done:'sp2'};
 const P_CLS={high:'ph2',mid:'pm',low:'plo'};
 const P_LBL={high:'عالية',mid:'متوسطة',low:'منخفضة'};
 
-let SB=null, CU=null, USERS=[], DEPTS=[], aFil='all', dFil='all', selDept='', openId=null;
+let SB=null, CU=null, USERS=[], DEPTS=[], OBS=[], aFil='all', aProj='all', oProj='all', pq='', dFil='all', openId=null, openScope='';
 
 const $=id=>document.getElementById(id);
 const $s=(id,v)=>{const e=$(id); if(e)e.textContent=v;};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const show=id=>$(id).style.display=id==='login-screen'?'flex':'block';
 const hide=id=>$(id).style.display='none';
 
@@ -612,6 +560,11 @@ function toast(msg){
   t.textContent=msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function chipCounts(cid,obs){
+  const c=counts(obs), m={all:c.tot,pending:c.pnd,progress:c.prg,done:c.don};
+  document.querySelectorAll('#'+cid+' .ccnt').forEach(e=>e.textContent=m[e.dataset.k]??0);
 }
 
 function chOn(cid,el){
@@ -656,28 +609,16 @@ function resetSB(){
   show('setup');
 }
 
-async function restoreSession(){
-  const ok=await initSB(SUPABASE_URL,SUPABASE_KEY);
-  if(!ok){show('login-screen');return;}
+const isAdmin=()=>CU && (CU.role==='admin' || CU.role==='limited_admin');
 
-  const {data}=await SB.auth.getSession();
-
-  if(!data.session){
-    show('login-screen');
-    return;
-  }
-
-  const user=data.session.user;
+async function loadProfile(user){
   const {data:profile,error}=await SB
     .from('user_profiles')
     .select('*')
     .eq('id',user.id)
     .single();
 
-  if(error || !profile){
-    show('login-screen');
-    return;
-  }
+  if(error || !profile) return false;
 
   CU={
     id:user.id,
@@ -687,23 +628,41 @@ async function restoreSession(){
     dept:profile.dept || '',
     email:user.email
   };
+  return true;
+}
+
+async function restoreSession(){
+  const ok=await initSB(SUPABASE_URL,SUPABASE_KEY);
+  if(!ok){show('login-screen');return;}
+
+  const {data}=await SB.auth.getSession();
+
+  if(!data.session || !await loadProfile(data.session.user)){
+    show('login-screen');
+    return;
+  }
 
   await openAppByRole();
 }
 
 async function openAppByRole(){
   aFil = 'all';
+  aProj = 'all';
+  oProj = 'all';
   dFil = 'all';
-  selDept = '';
+  pq = '';
+  if($('p-q')) $('p-q').value='';
   openId = null;
- 
+  openScope = '';
+  OBS = [];
+
   hide('login-screen');
   show('app');
 
   $s('nav-u',CU.label);
   $s('nav-sub',CU.role==='dept'?'واجهة القسم':'لوحة المدير');
 
-  if(CU.role==='admin' || CU.role==='limited_admin'){
+  if(isAdmin()){
     show('av');
     hide('dv');
 
@@ -718,17 +677,17 @@ async function openAppByRole(){
     if(ovTab) ovTab.classList.add('on');
     $('tp-ov').classList.add('show');
 
+    $('a-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
     await buildDeptFilter();
-    await renderAdmin();
-    await renderDeptTab();
 
   }else{
     show('dv');
     hide('av');
     $s('d-title','ملاحظات '+CU.label);
-    await renderDept();
+    $('d-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
   }
 
+  await rerender();
   checkReminder();
 }
 
@@ -751,27 +710,10 @@ async function doLogin(){
     return;
   }
 
-  const userId=data.user.id;
-
-  const {data:profile,error:profileError}=await SB
-    .from('user_profiles')
-    .select('*')
-    .eq('id',userId)
-    .single();
-
-  if(profileError || !profile){
+  if(!await loadProfile(data.user)){
     $('li-e').textContent='هذا المستخدم غير مربوط بالنظام';
     return;
   }
-
-  CU={
-    id:userId,
-    key:email,
-    role:profile.role,
-    label:profile.label,
-    dept:profile.dept || '',
-    email:email
-  };
 
   $('li-e').textContent='';
   await openAppByRole();
@@ -780,10 +722,14 @@ async function doLogin(){
 async function logout(){
   await SB.auth.signOut();
   CU=null;
+  OBS=[];
   openId=null;
+  openScope='';
   aFil='all';
+  aProj='all';
+  oProj='all';
   dFil='all';
-  selDept='';
+  pq='';
 
   hide('app');
   hide('av');
@@ -796,53 +742,91 @@ async function logout(){
   show('login-screen');
 }
 
-async function checkReminder(){
-  if(!SB || !CU) return;
+function checkReminder(){
+  if(!CU) return;
 
-  const cutoff=new Date(Date.now()-15*24*60*60*1000).toISOString();
-  let q=SB.from('observations').select('id').neq('status','done').lt('added',cutoff);
+  const cutoff=Date.now()-15*24*60*60*1000;
+  const late=OBS.filter(o=>o.status!=='done' && o.added && new Date(o.added).getTime()<cutoff).length;
 
-  if(CU.role==='dept') q=q.eq('dept',CU.dept);
-
-  const {data}=await q;
-
-  if(data && data.length){
-    $('rem-txt').innerHTML= `<strong>تذكير:</strong> يوجد <strong>${data.length}</strong> ملاحظة تجاوزت 15 يوماً دون إغلاق.`;
+  if(late){
+    $('rem-txt').innerHTML= `<strong>تذكير:</strong> يوجد <strong>${late}</strong> ملاحظة تجاوزت 15 يوماً دون إغلاق.`;
     $('rem').style.display='flex';
   }
 }
 
+// ══ DATA ════════════════════════════════════════════════════
+// Observations are fetched once into OBS; filters, tabs and opening
+// cards re-render from it. Only saves/adds/deletes fetch again (rerender).
 
+async function loadObs(){
+  let q=SB.from('observations').select('*').order('added',{ascending:false});
+  if(!isAdmin()) q=q.eq('dept',CU.dept);
 
-  
-async function renderDept(){
-  $('d-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
+  const {data,error}=await q;
 
-  const {data:all}=await SB
-    .from('observations')
-    .select('*')
-    .eq('dept',CU.dept)
-    .order('added',{ascending:false});
+  if(error){
+    console.log('OBS ERROR:',error);
+    toast('خطأ في تحميل الملاحظات');
+    return false;
+  }
 
-  if(!all) return;
+  OBS=data || [];
+  return true;
+}
 
-  const don=all.filter(o=>o.status==='done').length;
-  const prg=all.filter(o=>o.status==='progress').length;
-  const pnd=all.filter(o=>o.status==='pending').length;
-  const pct=all.length?Math.round(don/all.length*100):0;
+function paint(){
+  if(!CU) return;
 
-  $s('d-tot',all.length);
-  $s('d-pnd',pnd);
-  $s('d-prg',prg);
-  $s('d-don',don);
-  $s('d-pct',pct+'%');
-  $('d-bar').style.width=pct+'%';
+  if(isAdmin()){
+    renderAdmin();
+  }else{
+    renderDept();
+  }
 
-  const f=dFil==='all'?all:all.filter(o=>o.status===dFil);
+  if(openId) loadActions(openId);
+}
 
-  $('d-list').innerHTML=f.length
-    ? f.map(o=>card(o,false)).join('')
-    : '<div class="empty"><div class="ei">✅</div>لا توجد ملاحظات بهذا الفلتر</div>';
+async function rerender(){
+  if(!CU) return;
+  if(await loadObs()) paint();
+}
+
+function counts(obs){
+  const n=s=>obs.filter(o=>o.status===s).length;
+  const don=n('done');
+  return {
+    tot:obs.length,
+    don,
+    prg:n('progress'),
+    pnd:n('pending'),
+    pct:obs.length?Math.round(don/obs.length*100):0
+  };
+}
+
+function setStats(p,obs){
+  const c=counts(obs);
+  $s(p+'-tot',c.tot);
+  $s(p+'-pnd',c.pnd);
+  $s(p+'-prg',c.prg);
+  $s(p+'-don',c.don);
+  $s(p+'-pct',c.pct+'%');
+  $(p+'-bar').style.width=c.pct+'%';
+}
+
+function listHTML(obs,scope,isAdminCard,emptyIcon,emptyMsg){
+  return obs.length
+    ? obs.map(o=>card(o,isAdminCard,scope)).join('')
+    : `<div class="empty"><div class="ei">${emptyIcon}</div>${emptyMsg}</div>`;
+}
+
+// ══ DEPT VIEW ═══════════════════════════════════════════════
+
+function renderDept(){
+  setStats('d',OBS);
+  chipCounts('d-chips',OBS);
+
+  const f=dFil==='all'?OBS:OBS.filter(o=>o.status===dFil);
+  $('d-list').innerHTML=listHTML(f,'d',false,'✅','لا توجد ملاحظات بهذا الفلتر');
 }
 
 function df(el,f){
@@ -852,51 +836,82 @@ function df(el,f){
   renderDept();
 }
 
-async function renderAdmin(){
-  $('a-list').innerHTML='<div class="loading-row">جاري التحميل...</div>';
+// ══ ADMIN OVERVIEW ══════════════════════════════════════════
 
-  const {data:all}=await SB
-    .from('observations')
-    .select('*')
-    .order('added',{ascending:false});
+function renderAdmin(){
+  if(aProj!=='all' && !DEPTS.some(d=>d.dept===aProj)) aProj='all';
+  if(oProj!=='all' && !DEPTS.some(d=>d.dept===oProj)) oProj='all';
 
-  if(!all) return;
+  // Overview: stats follow the overview circle selection
+  renderProjCircles('ov-circles',oProj,'',p=>{oProj=oProj===p?'all':p;renderAdmin();});
+  const ov=oProj==='all'?OBS:OBS.filter(o=>o.dept===oProj);
+  setStats('a',ov);
+  $s('a-pct-lbl',oProj==='all'?'نسبة الإنجاز الكلية':'نسبة إنجاز '+getDeptName(oProj));
 
-  const don=all.filter(o=>o.status==='done').length;
-  const prg=all.filter(o=>o.status==='progress').length;
-  const pnd=all.filter(o=>o.status==='pending').length;
-  const pct=all.length?Math.round(don/all.length*100):0;
+  // Dept detail: list follows its own circle selection
+  renderDtCircles();
 
-  $s('a-tot',all.length);
-  $s('a-pnd',pnd);
-  $s('a-prg',prg);
-  $s('a-don',don);
-  $s('a-pct',pct+'%');
-  $('a-bar').style.width=pct+'%';
+  const scope=aProj==='all'?OBS:OBS.filter(o=>o.dept===aProj);
+  $s('a-ttl',aProj==='all'?'جميع الملاحظات':'ملاحظات '+getDeptName(aProj));
+  chipCounts('a-chips',scope);
 
-  let filt=all;
-  const deptKeys=DEPTS.map(d=>d.dept);
+  const filt=['pending','progress','done'].includes(aFil)
+    ? scope.filter(o=>o.status===aFil)
+    : scope;
 
-  if(deptKeys.includes(aFil)) filt=all.filter(o=>o.dept===aFil);
-  else if(['pending','progress','done'].includes(aFil)) filt=all.filter(o=>o.status===aFil);
-
-  $('a-list').innerHTML=filt.length
-    ? filt.map(o=>card(o,true)).join('')
-    : '<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات</div>';
+  $('a-list').innerHTML=listHTML(filt,'a',true,'📋','لا توجد ملاحظات');
 }
 
 function af(el,f){
   aFil=f;
   openId=null;
   chOn('a-chips',el);
-  chOn('dept-filter-chips',el);
   renderAdmin();
 }
 
-async function buildDeptFilter(){
-  const c=$('dept-filter-chips');
-  if(c) c.innerHTML='';
+function pf(p){
+  aProj=aProj===p?'all':p;
+  openId=null;
+  renderAdmin();
+}
 
+function renderDtCircles(){
+  renderProjCircles('dept-filter-chips',aProj,pq,pf);
+}
+
+// Renders project progress circles into container `cid`; `sel` is the active key,
+// `query` filters by project name, `pick(key)` handles clicks.
+function renderProjCircles(cid,sel,query,pick){
+  const c=$(cid);
+  if(!c) return;
+  const all=OBS;
+
+  const C=2*Math.PI*33;
+  const circ=(key,label,obs,extra)=>{
+    const {tot,pct}=counts(obs);
+    const on=sel===key;
+    return `<button class="pcirc ${extra||''} ${on?'on':''}" data-p="${esc(key)}" aria-pressed="${on}"
+      title="${esc(label)} — ${tot} ملاحظة، ${pct}% مكتملة">
+      <span class="pring">
+        <svg viewBox="0 0 72 72"><circle class="trk" cx="36" cy="36" r="33"/>
+        <circle class="val" cx="36" cy="36" r="33" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct/100)}"/></svg>
+        <span class="pnum"><b>${tot}</b><small>${pct}%</small></span>
+      </span>
+      <span class="plbl">${esc(label)}</span>
+    </button>`;
+  };
+
+  const q=query.trim().toLowerCase();
+  const shown=q?DEPTS.filter(d=>String(d.label).toLowerCase().includes(q)):DEPTS;
+
+  c.innerHTML=(q?'':circ('all','جميع المشاريع',all,'all'))+
+    shown.map(d=>circ(d.dept,d.label,all.filter(o=>o.dept===d.dept))).join('')+
+    (q&&!shown.length?'<div class="pnone">لا توجد مشاريع مطابقة</div>':'');
+
+  c.querySelectorAll('.pcirc').forEach(b=>b.onclick=()=>pick(b.dataset.p));
+}
+
+async function buildDeptFilter(){
   const {data,error}=await SB
     .from('departments')
     .select('*')
@@ -909,15 +924,6 @@ async function buildDeptFilter(){
 
   DEPTS=data;
 
-  data.forEach(d=>{
-    if(!c) return;
-    const b=document.createElement('button');
-    b.className='chip';
-    b.textContent=d.label;
-    b.onclick=()=>af(b,d.dept);
-    c.appendChild(b);
-  });
-
   const sel=$('n-d');
   sel.innerHTML='<option value="">— اختر —</option>';
 
@@ -927,113 +933,6 @@ async function buildDeptFilter(){
     o.textContent=d.label;
     sel.appendChild(o);
   });
-}
-
-async function changeDeptDetail(value){
-  selDept = value;
-  openId = null;
-  await renderDeptTab();
-}
-  
-async function renderDeptTab(){
-  const {data:depts,error:deptErr}=await SB
-    .from('departments')
-    .select('dept,label')
-    .order('label',{ascending:true});
-
-  if(deptErr){
-    console.log('DEPT TAB ERROR:',deptErr);
-    $('dept-grid').innerHTML='<div class="empty">خطأ في تحميل الأقسام</div>';
-    return;
-  }
-
-  DEPTS=depts || [];
-
-  const {data:all,error:obsErr}=await SB
-    .from('observations')
-    .select('*');
-
-  if(obsErr){
-    console.log('OBS ERROR:',obsErr);
-    $('dt-list').innerHTML='<div class="empty">خطأ في تحميل الملاحظات</div>';
-    return;
-  }
-
-  if(!depts || !depts.length){
-    $('dept-grid').innerHTML='<div class="empty">لا توجد أقسام مضافة</div>';
-    $('dt-title').textContent='—';
-    $('dt-list').innerHTML='';
-    return;
-  }
-
-  if(!selDept) selDept=depts[0].dept;
-
-  $('dt-select').innerHTML = depts.map(d =>
-  `<option value="${d.dept}" ${d.dept===selDept?'selected':''}>${d.label}</option>`
-).join('');
-
-  $('dept-grid').innerHTML=depts.filter(d=>d.dept===selDept).map(d=>{
-    const obs=(all||[]).filter(o=>o.dept===d.dept);
-    const don=obs.filter(o=>o.status==='done').length;
-    const prg=obs.filter(o=>o.status==='progress').length;
-    const pnd=obs.filter(o=>o.status==='pending').length;
-    const pct=obs.length?Math.round(don/obs.length*100):0;
-
-    return `<div class="dc${d.dept===selDept?' sel':''}" onclick="selDD('${d.dept}')">
-      <div class="dn">${d.label}</div>
-      <div style="display:flex;justify-content:space-between">
-        <span style="font-size:11px;color:var(--mut)">الإنجاز</span>
-        <span style="font-size:12px;font-weight:600;color:var(--navy)">${pct}%</span>
-      </div>
-      <div class="dbw"><div class="db" style="width:${pct}%"></div></div>
-      <div class="drow">
-        <div class="dm"><div class="dmv r">${pnd}</div><div class="dml">معلق</div></div>
-        <div class="dm"><div class="dmv a">${prg}</div><div class="dml">جارٍ</div></div>
-        <div class="dm"><div class="dmv g">${don}</div><div class="dml">منجز</div></div>
-        <div class="dm"><div class="dmv">${obs.length}</div><div class="dml">إجمالي</div></div>
-      </div>
-    </div>`;
-  }).join('');
-
-  await selDD(selDept,all);
-}
-
-async function selDD(d,preloaded){
-  selDept=d;
-  openId=null;
-
-  document.querySelectorAll('.dc').forEach(c=>c.classList.remove('sel'));
-  document.querySelectorAll('.dc').forEach(c=>{
-    if(c.getAttribute('onclick') && c.getAttribute('onclick').includes(d)){
-      c.classList.add('sel');
-    }
-  });
-
-  $s('dt-title','ملاحظات '+getDeptName(d));
-
-  let obs;
-
-  if(preloaded){
-    obs=preloaded.filter(o=>o.dept===d);
-  }else{
-    const {data,error}=await SB
-      .from('observations')
-      .select('*')
-      .eq('dept',d)
-      .order('added',{ascending:false});
-
-    if(error){
-      console.log('SEL DEPT ERROR:',error);
-      $('dt-list').innerHTML='<div class="empty">خطأ في تحميل ملاحظات القسم</div>';
-      return;
-    }
-
-    obs=data || [];
-  }
-
-  $('dt-list').innerHTML=obs.length
-    ? obs.map(o=>card(o,true)).join('')
-    : '<div class="empty"><div class="ei">📋</div>لا توجد ملاحظات لهذا القسم</div>';
 }
 
 async function addObs(){
@@ -1075,9 +974,10 @@ async function addObs(){
   $('n-dt').valueAsDate=new Date();
 
   toast('تمت إضافة الملاحظة ✓');
-  await renderAdmin();
-  await renderDeptTab();
+  await rerender();
 }
+
+// ══ CARDS & ACTIONS ═════════════════════════════════════════
 
 async function loadActions(id){
   const box=$('acts'+id);
@@ -1129,13 +1029,15 @@ return '<div class="' + itemClass + '">' +
   }).join('')+'</div>';
 }
 
-function card(o,isAdmin){
-  const isOpen=openId===o.id;
+// scope = which list the card is in ('a' admin dept detail, 'd' dept view).
+// A card opens only in the list it was clicked in, so form ids stay unique.
+function card(o,isAdmin,scope){
+  const isOpen=openId===o.id && openScope===scope;
   const tag=isAdmin? `<span class="dtag">${getDeptName(o.dept)}</span>`:'';
   const src=SRC_N[o.source] || '';
 
-  return `<div class="oc" id="c${o.id}">
-    <div class="oh" onclick="tog(${o.id})">
+  return `<div class="oc">
+    <div class="oh" onclick="tog(${o.id},'${scope}')">
       <span class="on2">#${String(o.id).slice(-4)}</span>
       <span class="op ${P_CLS[o.priority || 'mid']}"></span>
       <span class="os2">${o.short}</span>
@@ -1203,13 +1105,11 @@ function card(o,isAdmin){
   </div>`;
 }
 
-async function tog(id){
-  openId=openId===id?null:id;
-  await rerender();
-
-  if(openId){
-    await loadActions(id);
-  }
+function tog(id,scope){
+  const closing=openId===id && openScope===scope;
+  openId=closing?null:id;
+  openScope=closing?'':scope;
+  paint();
 }
 
 async function saveCard(id){
@@ -1257,7 +1157,6 @@ async function saveCard(id){
   toast('تم حفظ الإجراء ✓');
 
   await rerender();
-  await loadActions(id);
 }
 
 async function delObs(id,e){
@@ -1275,44 +1174,14 @@ async function delObs(id,e){
   if(openId===id) openId=null;
 
   toast('تم الحذف');
-  rerender();
+  await rerender();
 }
 
-async function rerender(){
-  if(!CU) return;
+function exportXL(all){
+  // OBS is already scoped to the user's dept for dept users
+  const data=all && aProj!=='all' ? OBS.filter(o=>o.dept===aProj) : OBS;
 
-  const keepOpen = openId;
-
-  if(CU.role === 'admin' || CU.role === 'limited_admin'){
-    await renderAdmin();
-
-    openId = keepOpen;
-
-    if(openId){
-      await loadActions(openId);
-    }
-
-    await renderDeptTab();
-
-    openId = keepOpen;
-
-  } else {
-    await renderDept();
-
-    if(openId){
-      await loadActions(openId);
-    }
-  }
-}
-
-async function exportXL(all){
-  let q=SB.from('observations').select('*').order('added',{ascending:false});
-
-  if(!all) q=q.eq('dept',CU.dept);
-
-  const {data}=await q;
-
-  if(!data || !data.length){
+  if(!data.length){
     toast('لا توجد بيانات للتصدير');
     return;
   }
@@ -1334,7 +1203,8 @@ async function exportXL(all){
   const wb=XLSX.utils.book_new();
 
   XLSX.utils.book_append_sheet(wb,ws,'الخطة التصحيحية');
-  XLSX.writeFile(wb,`خطة_تصحيحية_${new Date().toISOString().split('T')[0]}.xlsx`);
+  const proj=all && aProj!=='all' ? '_'+getDeptName(aProj).replace(/[\\/:*?"<>|\s]+/g,'_') : '';
+  XLSX.writeFile(wb,`خطة_تصحيحية${proj}_${new Date().toISOString().split('T')[0]}.xlsx`);
 
   toast('تم تصدير Excel ✓');
 }
